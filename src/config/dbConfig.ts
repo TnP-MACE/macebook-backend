@@ -2,21 +2,25 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
 config();
+import { Logger} from '@nestjs/common';
 import * as path from 'path';
 
 @Module({
   providers: [],
 })
 export class ConfigModule {
+  
   static forRoot(): DynamicModule {
     // const ePath = path.join(__dirname, '../**/*.entity{.ts,.js}');
     // const mPath = path.join(__dirname, '../**/migrations/*{.ts,.js}');
+    // const logger = new Logger('dbconfig');
     const isProduction = process.env.STAGE === 'prod';
+    // logger.log(`${process.env.STAGE}`)
     const provider = TypeOrmModule.forRoot({
-      // ssl: isProduction,
-      // extra: {
-      //   ssl: isProduction? { rejectUnauthorised : false } : null
-      // },
+      ssl: isProduction,
+      extra: {
+        ssl: isProduction? { rejectUnauthorised : false } : null
+      },
       type: 'postgres',
     //   url: process.env.DATABASE_URL,
       // name :'dev',
