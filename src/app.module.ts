@@ -25,10 +25,11 @@ import { configValidationSchema } from './config.schema';
       useFactory: async (configService: ConfigService) => {
         const isProduction = configService.get('STAGE') === 'prod'; 
         return{
-        ssl: isProduction,
-        extra: {
-          ssl: isProduction? { rejectUnauthorised : false } : null
-        },
+        // ssl: isProduction,
+        // extra: {
+        //   ssl: isProduction? { rejectUnauthorised : false } : null
+        // },
+        extra: { ssl: isProduction, rejectUnauthorized: false },
         type: 'postgres',
         autoLoadEntities: true,
         synchronize: true,
