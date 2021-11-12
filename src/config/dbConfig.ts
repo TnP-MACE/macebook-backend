@@ -8,7 +8,7 @@ import * as path from 'path';
 @Module({
   providers: [],
 })
-export class ConfigModule {
+export class ConfigDbModule {
   
   static forRoot(): DynamicModule {
     // const ePath = path.join(__dirname, '../**/*.entity{.ts,.js}');
@@ -37,7 +37,7 @@ export class ConfigModule {
       logging: ['query', 'error', 'schema', 'warn', 'info', 'log'],
     });
     return {
-      module: ConfigModule,
+      module: ConfigDbModule,
       imports: [provider],
       // providers: [provider] ,
       exports: [provider],
