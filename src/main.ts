@@ -21,7 +21,7 @@ async function bootstrap() {
       .addBearerAuth()
       // .addServer('http://')
       .build();
-
+  logger.log(`${process.env.DB_NAME}`)
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('api-doc', app, swaggerDocument);
   logger.log(`Api documentation available at "/api-doc/`);
