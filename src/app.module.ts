@@ -10,11 +10,13 @@ import { join } from 'path';
 import { CompanyModule } from './company/company.module';
 import { ConfigModule,ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { configValidationSchema } from './config.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [`.env.stage.${process.env.STAGE}`],
+      validationSchema: configValidationSchema,
     }),
     // ConfigDbModule.forRoot(),
     TypeOrmModule.forRootAsync({
