@@ -13,10 +13,10 @@ export class ConfigModule {
     // const mPath = path.join(__dirname, '../**/migrations/*{.ts,.js}');
     const isProduction = process.env.STAGE === 'prod';
     const provider = TypeOrmModule.forRoot({
-      ssl: isProduction,
-      extra: {
-        ssl: isProduction? { rejectUnauthorised : false } : null
-      },
+      // ssl: isProduction,
+      // extra: {
+      //   ssl: isProduction? { rejectUnauthorised : false } : null
+      // },
       type: 'postgres',
     //   url: process.env.DATABASE_URL,
       // name :'dev',
