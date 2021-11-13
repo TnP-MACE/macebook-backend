@@ -8,7 +8,9 @@ import localAuthenticationGuard from './guards/local-auth.guard'
 import { Response } from 'express';
 import RequestWithUser from './interfaces/requestWithUser.interface';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication & User')
 @Controller('api/v1/auth')
 export class UserController {
   private readonly logger = new Logger(UserController.name);

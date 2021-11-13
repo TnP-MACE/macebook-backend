@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -26,7 +25,7 @@ export class CreateUserDto {
   readonly email: string;
 
   @ApiProperty({ enum: ['student', 'alumnus']})
-  readonly type: string;
+  readonly type: UserType;
 
   @ApiProperty({
     description:

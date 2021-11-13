@@ -1,16 +1,12 @@
-import { Comments } from 'src/comments/entities/comment.entity';
-import { Posts } from 'src/posts/entity/post.entity';
 import Profile from 'src/profile/entities/profile.entity';
 import {
     Entity,
     Column,
-    PrimaryGeneratedColumn,
     CreateDateColumn,
     Unique,
-    OneToMany,
-    PrimaryColumn,
     OneToOne,
-    JoinColumn
+    JoinColumn,
+    PrimaryGeneratedColumn
   } from 'typeorm';
 
   export enum UserType {
@@ -20,10 +16,10 @@ import {
   }
 
   @Entity('User')
-  @Unique(['email'])
+  @Unique(['email','username'])
   export default class User {
-    // @PrimaryGeneratedColumn()
-    // id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
     
     @Column()
     uid: string;
@@ -31,14 +27,14 @@ import {
     @Column({unique:true})
     username: string;
   
-    @PrimaryColumn ({ length: 128, unique:true })
+    @Column ({ length: 128, unique:true })
     email: string;
   
     @Column({ length: 128 })
     password: string;
 
     @Column({default: UserType.GHOST})
-    type: string;
+    type: UserType;
 
     @Column()
     status: string;
