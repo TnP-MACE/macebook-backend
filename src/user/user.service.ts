@@ -25,16 +25,18 @@ export class UserService {
           email: email.toLowerCase(),
         });
         if (user) {
-          return {
-            success: false,
-            message: 'User already exist, please login.',
-          }
+          // return {
+          //   success: false,
+          //   message: 'E-mail already exist, please login.',
+          // }
+          throw new HttpException('E-mail already exist, please login.', HttpStatus.BAD_REQUEST);
         }
-        if (await this.userRepository.findOne({username: username.toLowerCase()})){
-          return {
-            success: false,
-            message: 'Username already taken'
-          }
+        else if (await this.userRepository.findOne({username: username.toLowerCase()})){
+          // return {
+          //   success: false,
+          //   message: 'Username already taken'
+          // }
+          throw new HttpException('Username already taken', HttpStatus.BAD_REQUEST);
         } else {
           data.password = await bcrypt.hash(data.password, 10);
           data.status = 'ACTIVE';
@@ -44,16 +46,16 @@ export class UserService {
           delete result.password;
           return {
             success: true,
-            message: 'Success',
             data: result,
           };
         }
     } catch (err) {
-      console.log('err', err);
-      return {
-        success: false,
-        message: 'Something went wrong..! Registration failed.',
-      };
+      //console.log('err', err);
+      // return {
+      //   success: false,
+      //   message: err,
+      // };
+      throw err;
     }
   }
 
@@ -64,16 +66,16 @@ export class UserService {
         if (match) {
           return user;
         }
-        throw new HttpException('Password incorrect', HttpStatus.UNAUTHORIZED);
+        throw new HttpException('Password incorrect', HttpStatus.BAD_REQUEST);
       }
-      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
   }
 
   public async validateUserJwt(email: string): Promise<any> {
     const user = await this.userRepository.findOne({where:{email}});
     if (user) 
         return user;
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
   }
 
    //Login 

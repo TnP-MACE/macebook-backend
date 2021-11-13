@@ -7,6 +7,12 @@ import {
   Matches,
 } from 'class-validator';
 
+export enum UserType {
+  STUDENT = "student",
+  ALUMNUS = "alumnus",
+  GHOST = "ghost"
+}
+
 export class CreateUserDto {
   @ApiProperty({ example: 'TnP MACE' })
   readonly username: string;
@@ -18,6 +24,9 @@ export class CreateUserDto {
   })
   @IsString()
   readonly email: string;
+
+  @ApiProperty({ enum: ['student', 'alumnus']})
+  readonly type: string;
 
   @ApiProperty({
     description:

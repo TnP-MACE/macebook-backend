@@ -7,12 +7,20 @@ import {
     CreateDateColumn,
     Unique,
     OneToMany,
+    PrimaryColumn,
   } from 'typeorm';
+
+  export enum UserType {
+    STUDENT = "student",
+    ALUMNUS = "alumnus",
+    GHOST = "ghost"
+  }
+
   @Entity('User')
   @Unique(['email'])
   export default class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    // @PrimaryGeneratedColumn()
+    // id: number;
     
     @Column()
     uid: string;
@@ -20,12 +28,15 @@ import {
     @Column({unique:true})
     username: string;
   
-    @Column({ length: 128, unique:true })
+    @PrimaryColumn ({ length: 128, unique:true })
     email: string;
   
     @Column({ length: 128 })
     password: string;
-  
+
+    @Column({default: UserType.GHOST})
+    type: string;
+
     @Column()
     status: string;
   
@@ -35,10 +46,8 @@ import {
     @OneToMany(()=>Comments, (comment)=>comment.user)
     comments:Comments[]
 
-
     //CONNECTION WITH POST MODULE
     @OneToMany(()=>Posts, (post)=>post.user)
     posts:Posts[]
-
     
   }
