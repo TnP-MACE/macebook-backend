@@ -42,13 +42,10 @@ import { configValidationSchema } from './config.schema';
     ProfileModule,
     PostsModule,
     ServeStaticModule.forRoot({
-      rootPath:join(__dirname,'..','uploads'),
-      
+      rootPath:join(__dirname,'..','uploads'),  
     })
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {
-  
-}
+export class AppModule { }
