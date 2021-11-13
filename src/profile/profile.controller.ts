@@ -13,7 +13,7 @@ import { ExperienceDto } from './dto/experience.dto';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { AuthGuard } from '@nestjs/passport';
 @ApiBearerAuth()
-@ApiTags('profile')
+@ApiTags('Profile')
 @Controller('api/v1/profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {

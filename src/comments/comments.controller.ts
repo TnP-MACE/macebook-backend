@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { CommentsService } from './comments.services';
 import { CommentsDto } from './dto/comment.dto';
 
 //POST USER AND COMMENTS are connected
 
-
-
+@ApiTags('Comments')
 @Controller("api/v1/comments")
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {
