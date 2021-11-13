@@ -12,6 +12,9 @@ import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import jwtAuthenticationGuard from 'src/user/guards/jwt-auth.guard'
 import localAuthenticationGuard from 'src/user/guards/local-auth.guard'
 import { AuthGuard } from '@nestjs/passport';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Posts')
 @Controller('api/v1/posts')
 export class PostsController {
     constructor (private readonly postservice:PostsService){
@@ -100,13 +103,4 @@ export class PostsController {
         return this.postservice.deletepostimage(post_id);
 
     }
-
-      
-
-   
-    
-
-    
-
 }
-
