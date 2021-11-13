@@ -1,4 +1,5 @@
 import { Comments } from 'src/comments/entities/comment.entity';
+import Profile from 'src/profile/entities/profile.entity';
 import  User  from "src/user/entities/user.entity";
 import {
     Entity,
@@ -39,8 +40,8 @@ export class Posts {
     @OneToMany(() => Comments, (comments) => comments.post)
     comments: Comments[];
 
-    //POST-USER CONNECTION
-    @ManyToOne(() => User, (user) => user.posts)
-    user: User;
+    //POST-PROFILE CONNECTION
+    @ManyToOne(() => Profile, (profile) => profile.posts)
+    profile: Profile;
 
 }

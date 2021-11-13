@@ -13,15 +13,17 @@ import Profile from './profile.entity';
   export default class Connections {
     @PrimaryGeneratedColumn('uuid')
     connection_id: string;
-  
+    
+    @ManyToOne(() => Profile, (profile) => profile.connections, { nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+    @JoinColumn()
+    connection_memberid: Profile;
+
     @ManyToOne(() => Profile, (profile) => profile.secondaryconnections, { nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
-    connected_profile: Profile;
+    member_id: Profile;
 
     @Column()
     status:string
 
-    @ManyToOne(() => Profile, (profile) => profile.connections, { nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
-    @JoinColumn()
-    profile: Profile;
+    
     
   }

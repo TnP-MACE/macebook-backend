@@ -5,6 +5,8 @@ import {Comments} from './entities/comment.entity'
 import { v4 as uuidv4 } from 'uuid';
 import { Posts } from "src/posts/entity/post.entity";
 import User from "src/user/entities/user.entity";
+import Profile from "src/profile/entities/profile.entity";
+import { profile } from "console";
 
 @Injectable()
 export class CommentsService {
@@ -13,22 +15,26 @@ export class CommentsService {
     private readonly commentRepository: Repository<Comments>,
     @InjectRepository(Posts)
     private readonly postRepository:Repository<Posts>,
+    @InjectRepository(Profile)
+    private readonly profileRepository:Repository<Profile>,
     @InjectRepository(User)
     private readonly userRepository:Repository<User>
 
   ) { }
-  async insertcomment(post_id: string, data: any): Promise<any> {
+  async insertcomment(data: any,post_id: string,user_id:string): Promise<any> {
 
 
     try {
       console.log(data)
       const post = await this.postRepository.findOne(post_id)
       const user = await this.userRepository.findOne({ where: { uid: data.user_id } })
+      const profile=await this.profileRepository.findOne({where:{profile_id:user.uid}})
+      
       if (post != null && user != null) {
         const comment= new Comments();
         comment.comment_id = uuidv4();
-        comment.user = user
-        comment.post = post;
+        comment.profile=profile;
+        comment.post = post;  
         comment.body = data.body;
         console.log(comment)
         await this.commentRepository.save(comment);

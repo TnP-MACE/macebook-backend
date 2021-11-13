@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Any, Repository } from 'typeorm';
+import { Any, In, Repository } from 'typeorm';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
 import { PostsDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostByTopic } from './dto/get-post-by-topic.dto';
+import Profile from 'src/profile/entities/profile.entity';
+import User from 'src/user/entities/user.entity';
 const fs = require('fs')
 
 
@@ -14,9 +16,14 @@ export class PostsService {
     constructor(
         @InjectRepository(Posts)
         private readonly postrepository:Repository<Posts>,
+        @InjectRepository(Profile)
+        private readonly profilerepository:Repository<Profile>,
+        @InjectRepository(User)
+        private readonly userrepository:Repository<User>
 
    
         ){}
+       
 
     async getallposts():Promise<any>{
         const query=this.postrepository.createQueryBuilder();
@@ -62,17 +69,27 @@ export class PostsService {
        
    }
 
-   async insertpost(data:PostsDto):Promise<any>{
+   async insertpost(data:PostsDto,user_id:string):Promise<any>{
        console.log(data)
        try{
-       
+        //const post = await this.postRepository.findOne(post_id)
+        const user = await this.userrepository.findOne({ where: { uid: user_id } })
+        console.log(user)
+        const profile=await this.profilerepository.findOne({where:{profile_id:'0a499666-75ec-42f3-9bf1-b1a8c978dabd'}})
+       console.log(profile)
        const {topic,text}=data;
         const post=this.postrepository.create({
             topic,
             text,
             likes:[],
+            comments:[],
+            
 
         })
+        post.profile=profile;
+
+        console.log(post)
+        
         await this.postrepository.save(post);
         return{
             post,

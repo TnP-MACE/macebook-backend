@@ -7,7 +7,6 @@ import { ProfileModule } from './profile/profile.module';
 import { PostsModule } from './posts/posts.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { CompanyModule } from './company/company.module';
 import { ConfigModule,ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidationSchema } from './config.schema';
@@ -42,7 +41,6 @@ import { configValidationSchema } from './config.schema';
     CommentsModule,
     ProfileModule,
     PostsModule,
-    CompanyModule,
     ServeStaticModule.forRoot({
       rootPath:join(__dirname,'..','uploads'),
       

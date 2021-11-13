@@ -37,9 +37,10 @@ export class PostsController {
         return this.postservice.getsinglepost(post_id)
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
-    InsertPost(@Body() postdto:PostsDto): Promise <any> {
-        return this.postservice.insertpost(postdto)
+    InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser): Promise <any> {
+        return this.postservice.insertpost(postdto,req.user.uid)
     }
 
     @Patch('/:post_id/update_post')
@@ -59,7 +60,8 @@ export class PostsController {
 
     }
 
-      // PROFILE AND COVER IMAGES
+      // POST IMAGES
+      @UseGuards(AuthGuard('jwt'))
       @Post('/picture/:post_id')
       @UseInterceptors(FileInterceptor('postimage', {
           storage: diskStorage({
@@ -74,6 +76,8 @@ export class PostsController {
         return this.postservice.uploadpostphoto(post_id, file.filename);
       }
 
+      // UPDATE POST IMAGE
+      @UseGuards(AuthGuard('jwt'))
       @Patch('/picture/:post_id')
       @UseInterceptors(FileInterceptor('postimage', {
           storage: diskStorage({
@@ -88,6 +92,8 @@ export class PostsController {
           return this.postservice.updatepostimage(post_id, file.filename);
       }
 
+      //DELETE POST IMAGE
+      @UseGuards(AuthGuard('jwt'))
       @Delete('/picture/:post_id')
         deletepostimage(@Param() post_id: string) {
         console.log("sd")

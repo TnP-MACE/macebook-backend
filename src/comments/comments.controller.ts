@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { CommentsService } from './comments.services';
 import { CommentsDto } from './dto/comment.dto';
 
@@ -34,8 +35,8 @@ getAllpostwithSomeComments(@Param() post_id:string):Promise<any>{
     return this.commentService.getpostsandsomecomments();
 }
 @Post(':post_id')// Post comments
-postcomment(@Param() post_id:string,@Body() data):Promise<any>{
-    return this.commentService.insertcomment(post_id,data);
+postcomment(@Param() post_id:string,@Req() req:RequestWithUser,@Body() data:any):Promise<any>{
+    return this.commentService.insertcomment(data,post_id,req.user.uid);
 }
 
 @Patch(':comment_id')// Update comment

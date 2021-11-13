@@ -1,45 +1,100 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString,MaxLength } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
+import Skills from '../entities/skills.entity';
 
+export class ProfileParameter{
+  profile_id:string
+}
 
-export class ProfileDto{
-        @ApiProperty({ 
-            description:"unique profile id",
-            type:'string'})
-        readonly profile_id: string;
-        @ApiProperty({
-          description: 'Users id',
-          type: 'string',
-        
-        })
-        @IsString()
-        readonly uid: string;
-        @ApiProperty({
-          description: 'Bio',
-          type: 'string',
-        })
-        @IsString()
-        @MaxLength(1024)
-        readonly bio: string;
-        @ApiProperty({
-            description: 'Adsress',
-            type: 'string',
-          })
-        @IsString()
-        @MaxLength(1024)
-        readonly adsress: string;
-        @ApiProperty({
-            description: 'User Type',
-            type: 'string',
-            example: 'Alumini',
-        })
-        @IsString()
-        readonly utype: string;
-        @ApiProperty({
-            description: 'Image Url',
-            type: 'string',
-        })
-        @IsString()
-        readonly img_url: string;
-      
+export class ProfileDto {
+  @ApiProperty({
+    description: 'Fullname',
+    type: 'string',
+    example:'Aneez Muhammed'
+  })
+  @IsString()
+  @MaxLength(128)
+  readonly fullname: string;
+
+  @ApiProperty({
+    description: 'Admission',
+    type: 'list',
+    example:{admission_no:'B18CS008',branch:'CSE',batch:'2019'}
+  })
+  @IsString()
+  readonly admission: { admission_no: string,branch:string, batch: string };
+  
+  @ApiProperty({
+    description: 'Phone No',
+    type: 'string',
+    example:'+919943435345'
+  })
+  @IsString()
+  @MaxLength(15)
+  readonly phoneno: string;
+
+  @ApiProperty({
+    description: 'Urs',
+    type: '"simple-json"',
+    example:{ personal_url:"www.sad.com", linkedin: "www.sad.com", facebook: "www.sad.com",github: "www.sad.com" }
+  })
+  @IsString()
+  readonly urls: { personal_url:string, linkedin: string, facebook: string,github: string };
+
+  @ApiProperty({
+    description: 'About',
+    type: 'string',
+    example:'This is a sample bio'
+  })
+  @IsString()
+  @MaxLength(1024)
+  readonly about: string;
+
+  @ApiProperty({
+    description: 'Address',
+    type: 'simple-json',
+    example:{ place:"Hello", district: "KTM", state: "Kerala",country: "India" }
+  })
+  @IsString()
+  readonly address: { place:string, district: string, state: string,country: string };
+
+  @ApiProperty({
+    description: 'Ref Name',
+    type: 'string',
+    example:'Kurian'
+  })
+  @IsString()
+  readonly ref_fullname: string;
+  
+  @ApiProperty({
+    description: 'Ref Email',
+    type: 'string',
+    example:'1@mail.com'
+  })
+  @IsString()
+  readonly ref_email: string;
+
+  @ApiProperty({
+    description: 'Ref Phone',
+    type: 'string',
+    example:'+9144434343'
+  })
+  @IsString()
+  readonly ref_phonenumber: string;
+
+  @ApiProperty({
+    description: 'Skills',
+    type: 'simple-array',
+    example:["CSS","HTML"]
+  })
+  @IsString()
+  readonly skills: Skills[];
+ 
+  @ApiProperty({
+    description: 'accomplishments',
+    type: 'simple-array',
+    example:["CSS","HTML"]
+  })
+  @IsString()
+  readonly accomplishments: string[];
 }

@@ -4,11 +4,9 @@ import { Repository } from "typeorm";
 import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
-import { profile } from 'console';
 import Skills from './entities/skills.entity';
 import Experience from './entities/experience.entity';
-import Company from 'src/company/entities/company.entity';
-// import Skills from './entities/skills.entity';
+
 const fs = require('fs')
 @Injectable()
 export class ProfileService {
@@ -20,95 +18,78 @@ export class ProfileService {
     @InjectRepository(Skills)
     private readonly skillsRepository: Repository<Skills>,
     @InjectRepository(Experience)
-    private readonly experienceRepository: Repository<Experience>,
-    @InjectRepository(Company)
-    private readonly companyRepository: Repository<Company>,
+    private readonly experienceRepository: Repository<Experience>
   ) { }
   async getProfileDetails(): Promise<any> {
     const profile = await this.profileRepository.find();
     return profile;
   }
-
-  async getOneprofileDetail(profile_id: any): Promise<any> {
-    // const profile = await this.profileRepository.find({ where: profile_id });
-    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills","skills").addSelect("skills.skill").where("profile.profile_id = :profile_id", { profile_id: profile_id.profile_id }).getOne()
+  async getProfileDetailsbyKey(key:string): Promise<any> {
+    // const entitymanager=getManager
+    var profile;
+    return profile;
+  }
+  async getOneprofileDetail(profile_id: string): Promise<any> {
+    var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
     return profile;
   }
 
-  async insertprofile(data: any): Promise<any> {
+  async insertprofile(data: any,profile_id:string): Promise<any> {
     try {
-      var skills =data["skills"]
-      //user_id
+      var skills = data["skills"]
       data.utype = "student"
+      data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);
-      console.log(profile)
-
-      console.log(skills)
-
-      // if (profile != null) {
-
-        var skillarray = []
+      var skillarray = []
+      if(skills){
         skills.forEach(element => {
           const skill = new Skills()
           skill.profile = profile.profile_id
           skill.skill = element
           skillarray.push(skill)
         });
-        console.log(skillarray)
-        await this.skillsRepository.delete({ profile: profile.profile_id })
-        await this.skillsRepository.save(skillarray)
-      // }
-
+      }
+      await this.skillsRepository.delete({ profile: profile.profile_id })
+      await this.skillsRepository.save(skillarray)
       return {
         success: true,
         message: 'Skills and post added'
       };
 
-      // }
 
     } catch (err) {
       console.log('err', err);
       return {
         success: false,
-        message: 'profile not inserted',
+        message: 'profile not completed',
       };
     }
   }
 
-  async updateprofile(data: any): Promise<any> {
+  async updateprofile(data: any,profile_id:string): Promise<any> {
     try {
-
-      // var skills = JSON.parse(data["skills"])
-      //user_id
+      var skills = data["skills"]
       data.utype = "student"
-      console.log(data)
-      // delete data.skills
+      data.profile_id=profile_id
+      delete data.skills
       var profile = await this.profileRepository.save(data);
-      console.log(profile)
-
-      // console.log(skills)
-
-      // if (profile != null) {
-
-      //   var skillarray = []
-      //   skills.forEach(element => {
-      //     const skill = new Skills()
-      //     skill.profile = profile.profile_id
-      //     skill.skill = element
-      //     skillarray.push(skill)
-      //   });
-      //   console.log(skillarray)
-      //   await this.skillsRepository.delete({ profile: profile.profile_id })
-      //   await this.skillsRepository.save(skillarray)
-      // }
-
+      var skillarray = []
+      if(skills){
+        skills.forEach(element => {
+          const skill = new Skills()
+          skill.profile = profile.profile_id
+          skill.skill = element
+          skillarray.push(skill)
+        });
+      }
+      await this.skillsRepository.delete({ profile: profile.profile_id })
+      await this.skillsRepository.save(skillarray)
       return {
         success: true,
-        message: 'Successfully updated profile',
-
+        message: 'Skills and post updated'
       };
-      // }
+
 
     } catch (err) {
       console.log('err', err);
@@ -144,18 +125,18 @@ export class ProfileService {
   // COVER AND PROFILE IMAGE
 
 
-  async uploadprofileimage(profile: any, url: string): Promise<any> {
+  async uploadprofileimage(profile_id: string, url: string): Promise<any> {
 
     try {
       var user = {
-        profile_id: profile.profile_id,
+        profile_id: profile_id,
         profile_image_url: url
       }
       await this.profileRepository.save(user)
 
       return {
         success: true,
-        message: 'profile picture is  updated'
+        message: 'profile picture is  uploaded'
       }
 
 
@@ -163,23 +144,23 @@ export class ProfileService {
       console.log('err', err);
       return {
         success: false,
-        message: 'profile not inserted',
+        message: 'profile picture not uploaded',
       };
     }
   }
 
-  async uploadcoverimage(profile: any, url: string): Promise<any> {
+  async uploadcoverimage(profile_id: string, url: string): Promise<any> {
 
     try {
       var user = {
-        profile_id: profile.profile_id,
+        profile_id: profile_id,
         cover_url: url
       }
       await this.profileRepository.save(user)
 
       return {
         success: true,
-        message: 'profile cover is updated'
+        message: 'profile cover is uploaded'
       }
 
 
@@ -187,14 +168,14 @@ export class ProfileService {
       console.log('err', err);
       return {
         success: false,
-        message: 'profile not inserted',
+        message: 'profile cover not uploaded',
       };
     }
   }
-  async updateprofileimage(profile: any, url: string): Promise<any> {
+  async updateprofileimage(profile_id: string, filenameget: string): Promise<any> {
 
     try {
-      var profiledata = await this.profileRepository.findOne(profile);
+      var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
       console.log(profiledata);
       var profile_image_url = profiledata.profile_image_url
       var url_split = profile_image_url.split("/")
@@ -207,15 +188,14 @@ export class ProfileService {
         console.error(err)
       }
       var user = {
-        profile_id: profile.profile_id,
-        cover_url: url
+        profile_id: profile_id,
+        profile_image_url: filenameget
       }
-
-      await this.profileRepository.save(user)
+      var pro= await this.profileRepository.save(user)
 
       return {
         success: true,
-        message: 'profile cover is updated'
+        message: 'profile image is updated'
       }
 
 
@@ -227,10 +207,50 @@ export class ProfileService {
       };
     }
   }
-  async updatecoverimage(profile: any, url: string): Promise<any> {
+  // async updateprofileimage(profile_id: string, url: string): Promise<any> {
+
+  //   try {
+  //     var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
+  //     console.log("profiledata");
+  //     // console.log(profiledata);
+  //     // var profile_image_url = profiledata.profile_image_url
+  //     // var url_split = profile_image_url.split("/")
+  //     var profile_image_url = profiledata.cover_url
+  //     var url_split = profile_image_url.split("/")
+  //     var filename = url_split[url_split.length - 1]
+  //     //  console.log(`.../uploads/profile/${filename}`)
+  //     try {
+  //       fs.unlinkSync(`./uploads/profile/${filename}`)
+  //       //file removed
+  //     } catch (err) {
+  //       console.error(err)
+  //     }
+  //     var user = {
+  //       profile_id: profile_id,
+  //       profile_image_url: url
+  //     }
+  //     await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: url }).where("profile_id = :profile_id", { profile_id: profile_id }).execute()
+  //     console.log(user)
+
+  //     return {
+  //       success: true,
+  //       message: 'profile cover is updated'
+  //     }
+
+
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'cover not inserted',
+  //     };
+  //   }
+  // }
+  async updatecoverimage(profile_id: any, filenameget: string): Promise<any> {
 
     try {
-      var profiledata = await this.profileRepository.findOne(profile);
+      var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
+
       console.log(profiledata);
       var cover_url = profiledata.cover_url
       var url_split = cover_url.split("/")
@@ -238,13 +258,13 @@ export class ProfileService {
       //  console.log(`.../uploads/profile/${filename}`)
       try {
         fs.unlinkSync(`./uploads/cover/${filename}`)
-        //file removed
+
       } catch (err) {
         console.error(err)
       }
       var user = {
-        profile_id: profile.profile_id,
-        cover_url: url
+        profile_id: profile_id,
+        cover_url: filenameget
       }
       await this.profileRepository.save(user)
 
@@ -326,26 +346,26 @@ export class ProfileService {
 
   // CONNECTIONS
 
-  async connectioninvite(user: any, current_User: any): Promise<any> {
+  async connectioninvite(user_id: string, current_User: any): Promise<any> {
 
-    if (user.id != current_User) {
+    if (user_id != current_User) {
       try {
-        console.log(user)
+        console.log(user_id)
         console.log(current_User)
 
-        var user_details = await this.profileRepository.findOne(user.id)
+        var user_details = await this.profileRepository.findOne(user_id)
         var current_User_details = await this.profileRepository.findOne(current_User)
 
         if (user_details && current_User_details) {
-          var check = await this.connectionRepository.findOne({ connected_profile: user_details, profile: current_User_details })
+          var check = await this.connectionRepository.findOne({ member_id: user_details, connection_memberid: current_User_details })
           console.log(check)
           if (check == null) {
             var data = new Connections()
             data = {
               connection_id: uuidv4(),
-              connected_profile: user_details,
+              member_id: user_details,
               status: "invite",
-              profile: current_User_details
+              connection_memberid: current_User_details
             }
             await this.connectionRepository.save(data);
             return {
@@ -385,16 +405,16 @@ export class ProfileService {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
         if (user_details && current_User_details) {
-          var check = await this.connectionRepository.findOne({ connected_profile: current_User_details, profile: user_details, status: "invite" })
+          var check = await this.connectionRepository.findOne({ member_id: current_User_details, connection_memberid: user_details, status: "invite" })
           console.log(check)
           if (check != null) {
             await this.connectionRepository.createQueryBuilder().update(Connections).set({ status: "connected" }).where("connection_id = :connection_id", { connection_id: check.connection_id }).execute()
             var data = new Connections()
             data = {
               connection_id: uuidv4(),
-              connected_profile: user_details,
+              member_id: user_details,
               status: "connected",
-              profile: current_User_details
+              connection_memberid: current_User_details
             }
             await this.connectionRepository.save(data);
             return {
@@ -427,18 +447,18 @@ export class ProfileService {
 
 
   async connectiondisconnect(user: any, current_User: any): Promise<any> {
-    
+
     if (user.id != current_User) {
-      
+
       try {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
-       await this.connectionRepository.createQueryBuilder().delete().where({connected_profile: current_User_details, profile: user_details, status: "connected"}).execute()
-       await this.connectionRepository.createQueryBuilder().delete().where({connected_profile: user_details, profile: current_User_details,status: "connected"}).execute()
-       return {
-        success: true,
-        message: 'Disconnected',
-      };
+        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: current_User_details, profile: user_details, status: "connected" }).execute()
+        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: user_details, profile: current_User_details, status: "connected" }).execute()
+        return {
+          success: true,
+          message: 'Disconnected',
+        };
       } catch (err) {
         return {
           success: false,
@@ -459,11 +479,11 @@ export class ProfileService {
       try {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
-       await this.connectionRepository.createQueryBuilder().delete().where({connected_profile: user_details, profile: current_User_details, status: "invite"}).execute()
-       return {
-        success: true,
-        message: 'Cancelled',
-      };
+        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: user_details, profile: current_User_details, status: "invite" }).execute()
+        return {
+          success: true,
+          message: 'Cancelled',
+        };
       } catch (err) {
         console.log('err', err);
         return {
@@ -485,76 +505,65 @@ export class ProfileService {
   // EXPERIENCE
 
   async addExperience(profile_id: any, data: any): Promise<any> {
-
+    console.log(profile_id)
+console.log("data");
+    try {
       try {
-       try {
-        var profile=await this.profileRepository.findOne(profile_id);
-        var company=await this.companyRepository.findOne(data.company_id);
-       } catch (error) {
-         console.log(error)
-       }
-        
-        if(company !=null){
-        data.company=company;
+        var profile = await this.profileRepository.findOne(profile_id);
+      } catch (error) {
+        console.log(error)
+      }
+console.log(profile)
+      data.profile = profile.profile_id
+      console.log(data);
 
-        }
-        data.profile=profile
-        console.log(data)
+      var exp= await this.experienceRepository.save(data);
 
-        this.experienceRepository.save(data);
-        return {
+      console.log(exp);
+      return {
+        experience:exp,
         success: true,
         message: 'Experience Added',
       };
-      } catch (err) {
-        return {
-          success: false,
-          message: 'Cannot Add Experience',
-        };
-      }}
-      async updateExperience(profile_id: string,experience_id:string ,data: any): Promise<any> {
+    } catch (err) {
+      return {
+        success: false,
+        message: 'Cannot Add Experience',
+      };
+    }
+  }
+  async updateExperience( experience_id: string, data: any): Promise<any> {
 
-        try {
-         try {
-          var profile=await this.profileRepository.findOne(profile_id);
-          var company=await this.companyRepository.findOne(data.company_id);
-         } catch (error) {
-           console.log(error)
-         }
-          
-          if(company !=null){
-          data.company=company;
-  
-          }
-          data.profile=profile
-          console.log(data)
-          delete(data.company_id)
-          this.experienceRepository.createQueryBuilder().update(Experience).set(data).where("experience_id = :experience_id",{experience_id:experience_id}).execute();
-          return {
-          success: true,
-          message: 'Experience Updated',
-        };
-        } catch (err) {
-          return {
-            success: false,
-            message: 'Cannot Update Experience',
-          };
-        }}
-      async deleteExperience(profile_id: string, experience_id: string): Promise<any> {
+    try {
+      console.log(experience_id);
+      delete (data.company_id)
+      this.experienceRepository.createQueryBuilder().update(Experience).set(data).where("experience_id = :experience_id", { experience_id: experience_id }).execute();
+      return {
+        success: true,
+        message: 'Experience Updated',
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: 'Cannot Update Experience',
+      };
+    }
+  }
+  async deleteExperience(experience_id: string): Promise<any> {
 
-        try {
-          var profile = await this.profileRepository.findOne(profile_id)
-         await this.experienceRepository.createQueryBuilder().delete().where({experience_id: experience_id, profile: profile}).execute()
-         return {
-          success: true,
-          message: 'Deleted',
-        };
-        } catch (err) {
-          return {
-            success: false,
-            message: 'Cannot Delete',
-          };
-        }}
-   
+    try {
+      await this.experienceRepository.createQueryBuilder().delete().where({ experience_id: experience_id }).execute()
+      return {
+        success: true,
+        message: 'Deleted',
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: 'Cannot Delete',
+      };
+    }
+  }
+
 }
 
