@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CommentsModule } from './comments/comments.module';
-import { ConfigDbModule } from './config/dbConfig';
+//import { ConfigDbModule } from './config/dbConfig';
 import { UserModule } from './user/user.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ProfileModule } from './profile/profile.module';
@@ -25,12 +25,7 @@ import { configValidationSchema } from './config.schema';
       useFactory: async (configService: ConfigService) => {
         const isProduction = configService.get('STAGE') === 'prod'; 
         return{
-        // ssl: isProduction,
-        // extra: {
-        //   ssl: isProduction? { rejectUnauthorised : false } : null
-        // },
-        ssl: { rejectUnauthorized: false },
-        //extra: { ssl: true, rejectUnauthorized: false },
+        ssl: isProduction ? { rejectUnauthorized: false } : null,
         type: 'postgres',
         autoLoadEntities: true,
         synchronize: true,
