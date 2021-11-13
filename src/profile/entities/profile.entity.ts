@@ -63,7 +63,7 @@ export default class Profile {
   accomplishments: string[];
 
   @OneToMany(() => Connections, (connection) => connection.connection_memberid,{nullable:true})
-  connections: Connections[];//We try to connect others
+  connections: Connections[];//Our connectinos
 
   @OneToMany(() => Connections, (connection) => connection.member_id,{nullable:true})
   secondaryconnections: Connections[];//Others who try to connect us

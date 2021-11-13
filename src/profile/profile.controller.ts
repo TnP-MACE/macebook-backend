@@ -225,7 +225,7 @@ export class ProfileController {
   Cancel(@Param() id: string, @Body() body: ConnectionDto) {
     return this.profileService.connectioncancel(id, body.profile_id);
   }
-
+  //add pid
   @Post('/:id/connect')
   @ApiOperation({ summary: 'Connect' })
   @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })

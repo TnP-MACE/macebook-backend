@@ -400,7 +400,7 @@ export class ProfileService {
 
     if (user.id != current_User) {
       try {
-        // console.log(user)
+        console.log(user)
         // console.log(current_User)
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
@@ -453,8 +453,8 @@ export class ProfileService {
       try {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
-        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: current_User_details, profile: user_details, status: "connected" }).execute()
-        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: user_details, profile: current_User_details, status: "connected" }).execute()
+        var stu1=await this.connectionRepository.createQueryBuilder().delete().where({ member_id: current_User_details, connection_memberid: user_details, status: "connected" }).execute()
+        var stu2=await this.connectionRepository.createQueryBuilder().delete().where({ member_id: user_details, connection_memberid: current_User_details, status: "connected" }).execute()
         return {
           success: true,
           message: 'Disconnected',
