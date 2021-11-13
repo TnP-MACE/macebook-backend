@@ -19,15 +19,11 @@ async function bootstrap() {
       .setTitle('Macebook Server')
       .setDescription('TnP MACE')
       .setVersion('1.0.0')
-      //.addTag('TnP MACE')
       .addBearerAuth()
-      // .addServer('http://')
       .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('api-doc', app, swaggerDocument);
-  logger.log(`Api documentation available at "/api-doc/`);
-
-  
+  logger.log(`Api documentation available at "/api-doc/`); 
 
   const port = process.env.PORT || 4009;
   await app.listen(port);
