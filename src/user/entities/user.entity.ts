@@ -1,4 +1,5 @@
 import { Comments } from 'src/comments/entities/comment.entity';
+import { Posts } from 'src/posts/entity/post.entity';
 import {
     Entity,
     Column,
@@ -33,4 +34,11 @@ import {
     
     @OneToMany(()=>Comments, (comment)=>comment.user)
     comments:Comments[]
+
+
+    //CONNECTION WITH POST MODULE
+    @OneToMany(()=>Posts, (post)=>post.user)
+    posts:Posts[]
+
+    
   }

@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
 import { PostsDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostByTopic } from './dto/get-post-by-topic.dto';
+const fs = require('fs')
 
 
 @Injectable()
@@ -29,8 +30,9 @@ export class PostsService {
       
        if(search){
            query.andWhere(
-            'post.text LIKE :search',{search:`%${search}%`}
+            'post.text LIKE :search OR post.topic LIKE :search',{search:`%${search}%`}
            );
+           
        }
     
        const posts=await query.getMany();
@@ -145,7 +147,7 @@ export class PostsService {
 
    async likepost(post_id:string,user_id:string):Promise<any>{
        try{
-           const post=await this.getsinglepost(user_id)
+           const post=await this.getsinglepost(post_id)
            if(post.likes.some(like => like === user_id)){
                 post.likes.splice(post.likes.indexOf(user_id),1);
                 return await this.postrepository.save(post)
@@ -158,8 +160,108 @@ export class PostsService {
            throw(err)
        }
 
+    
+
+   }
+   
+   async uploadpostphoto(post:any,image_name:string):Promise<any>{
+    try {
+        var user = {
+          post_id: post.post_id,
+          post_image_name: image_name
+        }
+        await this.postrepository.save(user)
+        return {
+          success: true,
+          message: 'post picture is  updated'
+        }
+  
+  
+      } catch (err) {
+        console.log('err', err);
+        return {
+          success: false,
+          message: 'Post image not inserted',
+        };
+      }
+
    }
 
+   async updatepostimage(post_id: any, image_name: string): Promise<any> {
+
+    try {
+      var postdata = await this.postrepository.findOne(post_id);
+      console.log(post_id);
+      var filename = postdata.post_image_name
+      /* var url_split = profile_image_url.split("/")
+      var filename = url_split[url_split.length - 1] */
+      //  console.log(`.../uploads/profile/${filename}`)
+      try {
+        fs.unlinkSync(`./uploads/post/${filename}`)
+        //file removed
+      } catch (err) {
+        console.error(err)
+      }
+      var user = {
+        post_id: postdata.post_id,
+        post_image_name: image_name
+      }
+
+      await this.postrepository.save(user)
+
+      return {
+        success: true,
+        message: 'post image is updated'
+      }
+
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'post image is not inserted',
+      };
+    }
+
+    
+
+
+
+  }
+
+  async deletepostimage(post_id: any): Promise<any> {
+    try {
+      var postdata = await this.postrepository.findOne(post_id);
+      console.log(postdata);
+      var filename = postdata.post_image_name
+      /* var url_split = profile_image_url.split("/")
+      var filename = url_split[url_split.length - 1] */
+      //  console.log(`.../uploads/profile/${filename}`)
+      try {
+        fs.unlinkSync(`./uploads/post/${filename}`)
+        //file removed
+      } catch (err) {
+        console.error(err)
+      }
+      /* var profiledatas = await this.postrepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profile.profile_id }).execute() */
+      var user={
+          post_id:postdata.post_id,
+          post_image_url:null
+
+      }
+      this.postrepository.save(user);
+      return {
+        success: true,
+        message: 'Successfully deleted post image',
+      };
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'post picture not delete',
+      };
+    }
+  }
  
 
    

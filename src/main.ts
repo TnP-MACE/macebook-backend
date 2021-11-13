@@ -4,10 +4,12 @@ import { Logger} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv'; config();
 import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
 
 async function bootstrap() {
   const logger = new Logger('Macebook Server');
   const app = await NestFactory.create(AppModule);
+  console.log(join(__dirname,'..','uploads'))
   app.enableCors({
     origin: 'http://localhost:3000',
     credentials: true,
@@ -24,6 +26,8 @@ async function bootstrap() {
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('api-doc', app, swaggerDocument);
   logger.log(`Api documentation available at "/api-doc/`);
+
+  
 
   const port = process.env.PORT || 4009;
   await app.listen(port);

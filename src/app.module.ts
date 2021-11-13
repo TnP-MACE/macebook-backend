@@ -44,10 +44,13 @@ import { configValidationSchema } from './config.schema';
     PostsModule,
     CompanyModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..','uploads'),  
+      rootPath:join(__dirname,'..','uploads'),
+      
     })
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  
+}
