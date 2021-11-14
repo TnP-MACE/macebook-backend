@@ -24,9 +24,9 @@ export class UserController {
   @UseGuards(localAuthenticationGuard)
   @Post('login')
   async login(@Req() request: RequestWithUser, @Body() loginUserDto:LoginUserDto, @Res({ passthrough: true }) res: Response) {
-    const cookie  = this.userService.login(request.user);
-    res.setHeader('Set-Cookie', cookie)
-    return request.user
+    const accessToken  = this.userService.login(request.user);
+    // res.setHeader('Set-Cookie', cookie)
+    return {...request.user, access_token: accessToken }
   }
 
   @UseGuards(jwtAuthenticationGuard)

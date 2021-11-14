@@ -83,7 +83,8 @@ export class UserService {
       delete user1.password
       const payload = { email: user1.email };
       const accessToken = this.jwtService.sign(payload);
-      return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;  
+      return accessToken
+      // return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;  
   }
 
   //logout
