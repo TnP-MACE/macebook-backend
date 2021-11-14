@@ -8,14 +8,14 @@ import localAuthenticationGuard from './guards/local-auth.guard'
 import { Response } from 'express';
 import RequestWithUser from './interfaces/requestWithUser.interface';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Authentication & User')
 @Controller('api/v1/auth')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
   constructor(private readonly userService: UserService) {}
-
+ 
   @Post('register')
   register(@Body() createUserDto: CreateUserDto): Promise<any> {
     return this.userService.register(createUserDto);
@@ -29,6 +29,8 @@ export class UserController {
     return {...request.user, access_token: accessToken }
   }
 
+
+  @ApiBearerAuth()
   @UseGuards(jwtAuthenticationGuard)
   @Post('logout')
   async logOut(@Req() request, @Res() response: Response) {
@@ -36,6 +38,7 @@ export class UserController {
     return response.sendStatus(200);
   }
 
+  @ApiBearerAuth()
   @UseGuards(jwtAuthenticationGuard)
   @Delete('delete-account')
   async deleteUser(@Body() body, @Req() req : RequestWithUser){
@@ -48,6 +51,7 @@ export class UserController {
     }
   }
 
+  @ApiBearerAuth()
   @UseGuards(jwtAuthenticationGuard)
   @Patch('edit-username')
   async editUsername(@Body() body, @Req() req: RequestWithUser){
@@ -56,6 +60,7 @@ export class UserController {
     return await this.userService.editUsername(uid,username)
   }
 
+  @ApiBearerAuth()
   @UseGuards(jwtAuthenticationGuard)
   @Patch('change-password')
   async changePass(@Body() changePasswordDto: ChangePasswordDto, @Req() req: RequestWithUser){
@@ -67,6 +72,7 @@ export class UserController {
     }
   }
 
+  @ApiBearerAuth()
   @UseGuards(jwtAuthenticationGuard)
   @Get()
   authenticate(@Req() request: RequestWithUser) {
@@ -74,4 +80,5 @@ export class UserController {
     user.password = undefined;
     return user;
   }
+  
 }

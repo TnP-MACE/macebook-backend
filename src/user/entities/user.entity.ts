@@ -9,11 +9,11 @@ import {
     PrimaryGeneratedColumn
   } from 'typeorm';
 
-  export enum UserType {
-    STUDENT = "student",
-    ALUMNUS = "alumnus",
-    GHOST = "ghost"
-  }
+  // export enum UserType {
+  //   STUDENT = "student",
+  //   ALUMNUS = "alumnus",
+  //   GHOST = "ghost"
+  // }
 
   @Entity('User')
   @Unique(['email','username'])
@@ -33,8 +33,8 @@ import {
     @Column({ length: 128 })
     password: string;
 
-    @Column({default: UserType.GHOST})
-    type: UserType;
+    @Column({default: 'ghost'})
+    type: string;
 
     @Column()
     status: string;

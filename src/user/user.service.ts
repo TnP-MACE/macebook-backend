@@ -7,6 +7,7 @@ import { Repository, DeleteResult } from 'typeorm';
 import User from './entities/user.entity';
 import { jwtConstants } from '../config/constants';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -18,20 +19,17 @@ export class UserService {
   ){}
 
   // register a user
-  async register(data: any): Promise<any> {
+  public async register(data: CreateUserDto){
     try {
         const { email, username } = data;
-        const user = await this.userRepository.findOne({
+        let user = await this.userRepository.findOne({
           email: email.toLowerCase(),
         });
         if (user) {
-          // return {
-          //   success: false,
-          //   message: 'E-mail already exist, please login.',
-          // }
-          throw new HttpException('E-mail already exist, please login.', HttpStatus.BAD_REQUEST);
-        }
-        else if (await this.userRepository.findOne({username: username.toLowerCase()})){
+            throw new HttpException('E-mail already exist, please login.', HttpStatus.BAD_REQUEST);
+          }
+         user = await this.userRepository.findOne({username: username.toLowerCase()})
+        if (user){
           // return {
           //   success: false,
           //   message: 'Username already taken'
@@ -41,8 +39,8 @@ export class UserService {
           data.password = await bcrypt.hash(data.password, 10);
           data.status = 'ACTIVE';
           data.uid = uuidv4();
-          const fetchUser = await this.userRepository.save(data);
-          const { ...result } = fetchUser;
+          const result = await this.userRepository.save(data);
+          // const { ...result } = fetchUser;
           delete result.password;
           return {
             success: true,
@@ -131,10 +129,8 @@ export class UserService {
           .where('email = :email',{email})
           .execute();
     }
-    } catch (err){
+    }catch (err){
       throw err;
     }
-
   }
-
 }

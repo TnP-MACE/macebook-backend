@@ -4,33 +4,38 @@ import {
   MaxLength,
   MinLength,
   Matches,
+  IsEmail,
+  IsEnum,
+  IsOptional,
 } from 'class-validator';
-
-export enum UserType {
-  STUDENT = "student",
-  ALUMNUS = "alumnus",
-  GHOST = "ghost"
-}
 
 export class CreateUserDto {
   @ApiProperty({ example: 'TnP MACE' })
-  readonly username: string;
+  username: string;
 
   @ApiProperty({
     description: 'Email address',
     type: 'string',
     example: 'b19ec058@mace.ac.in',
   })
-  @IsString()
-  readonly email: string;
+  @IsEmail()
+  email: string;
 
   @ApiProperty({ enum: ['student', 'alumnus']})
-  readonly type: UserType;
+  type: string;
+  
+  // @ApiProperty()
+  // @IsOptional()
+  // status : string;
+
+  // @ApiProperty()
+  // @IsOptional()
+  // uid : string;
 
   @ApiProperty({
     description:
       ' Password with Minimum 1 symbol , Uppercase and Lowecase Characters,' +
-      ' number with minimum length of 14 characters',
+      ' number with minimum length of 8 characters',
     type: 'string',
     example: 'AZDq-49.orAZWN',
   })
@@ -38,9 +43,12 @@ export class CreateUserDto {
     message: 'too weak password',
   })
   @IsString()
-  @MinLength(14)
+  @MinLength((8))
   @MaxLength(128)
-  readonly password: string;
+  password: string;
+  
+  status: string;
+  uid: string;
 
   // @ApiProperty({
   //   required: false,

@@ -10,17 +10,7 @@ export class LoginUserDto {
   @IsEmail()
   email: string;
   
-
-  @ApiProperty({
-    description:
-      ' Password with Minimum 1 symbol , Uppercase and Lowecase Characters,' +
-      ' number with minimum length of 14 characters',
-    type: 'string',
-    example: 'AZDq-49.orAZWN',
-  })
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'too weak password',
-  })
+  @ApiProperty()
   @IsString()
   @MinLength(14)
   @MaxLength(128)
