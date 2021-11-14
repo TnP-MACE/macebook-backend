@@ -53,26 +53,26 @@ export class JobsService {
     }
   }
 
-  async updatejob(data: any): Promise<any> {
-    try {
+  // async updatejob(data: any): Promise<any> {
+  //   try {
 
-      await this.jobsRepository.save(data);
+  //     await this.jobsRepository.save(data);
 
-      return {
-        success: true,
-        message: 'Successfully updated job',
+  //     return {
+  //       success: true,
+  //       message: 'Successfully updated job',
 
-      };
-      // }
+  //     };
+  //     // }
 
-    } catch (err) {
-      console.log('err', err);
-      return {
-        success: false,
-        message: 'job not updated',
-      };
-    }
-  }
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'job not updated',
+  //     };
+  //   }
+  // }
   async deletejob(job_id: string): Promise<any> {
     try {
 
@@ -197,18 +197,7 @@ export class JobsService {
           success: true,
           message: 'Status Changed',
         };
-  //     await this.applicationsRepository.save(data);
-  //     await this.applicationsRepository.createQueryBuilder()
-	// .update(Applications)
-	// .set({ status: 2 })
-	// .where("jobsjobid = :id", { id: 123 })
-	// .returning("value")
-  //     return {
-  //       success: true,
-  //       message: 'Successfully updated job',
-
-  //     };
-      // }
+  
 
     } catch (err) {
       console.log('err', err);
@@ -343,6 +332,25 @@ console.log(filename)
       return {
         success: false,
         message: 'not deleted resume',
+      };
+    }
+  }
+
+  async updatejob(id: any,data:any): Promise<any> {
+    try {
+      console.log(data)
+      this.applicationsRepository.createQueryBuilder().update(Jobs).set(data).where("job_id = :job_id",{job_id:id}).execute();
+          return {
+          success: true,
+          message: 'job updated',
+        };
+  
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'Job not changed',
       };
     }
   }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsArray, IsString, ValidateNested } from 'class-validator';
 
 
 export class JobsDto{
@@ -11,54 +11,82 @@ export class JobsDto{
         @ApiProperty({
           description: 'Users id',
           type: 'string',
-        
+          example:'vwsjjbjjxj'
         })
         @IsString()
         readonly uid: string;
         @ApiProperty({
           description: 'Job name',
           type: 'string',
-         example: 'Job name like full stack developer',
+         example: 'Software Devloper',
         })
         @IsString()
         readonly job_name: string;
         @ApiProperty({
             description: 'Job Type',
             type: 'string',
-           example: 'full time, 1-2 year experience',
+           example: ["Full Time","1 year Experience"],
           })
           @IsString()
           readonly job_type: string;
           @ApiProperty({
             description: 'Job Details',
             type: 'string',
-            example: 'Like full time empoloyment or 1 year',
+            example: 'A good job with free food',
           })
           @IsString()
-          readonly job_details: string;
+          readonly job_description: string;
         
           @ApiProperty({
             description: 'Company name',
             type: 'string',
-            example: 'Apple facebook',
+            example: 'Apple',
           })
           @IsString()
           readonly company_name: string;
 
           @ApiProperty({
-            description: 'skills',
-            type: 'list',
-            example: 'C python',
+            description: 'Salary',
+            type: 'string',
+            example: '1000',
           })
           @IsString()
-          readonly skills: string;
+          readonly salary: string;
+
+          @ApiProperty({
+            description: 'skills',
+            type: 'list',
+            example: ["C++","java","python"],
+          })
+          @IsArray()
+          readonly skills: string[];
 
           @ApiProperty({
             description: 'Address of company',
             type: 'string',
-            example: 'Sanfransisco, California',
+            example: {
+              state:"California",
+              city:"LA"
+          },
+          })
+          @ValidateNested()
+          readonly address: {state:string,city:string};
+    
+          @ApiProperty({
+            description: 'Domain of company',
+            type: 'string',
+            example: 'apple.com',
           })
           @IsString()
-          readonly address: string;
-          
+          readonly domain: string;
 }
+
+export class SearchJobsDto{
+  @ApiProperty({ 
+      description:"search job",
+      type:'string'})
+  @IsString()
+  readonly search: string;
+ }
+
+ 

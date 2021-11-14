@@ -8,31 +8,31 @@ export class ApplicationsDto{
             type:'string'})
         @IsString()
         readonly application_id: string;
-        @ApiProperty({
-          description: 'Job id',
-          type: 'string',
-        
-        })
-        @IsString()
-        readonly job_id: string;
+        // @ApiProperty({
+        //   description: 'Job id',
+        //   type: 'string',
+        //   example:''
+        // })
+        // @IsString()
+        // readonly job_id: string;
         @ApiProperty({
           description: 'student Id',
           type: 'string',
-         example: 'Unique student id',
+         example: '101',
         })
         @IsString()
         readonly student_id: string;
-        @ApiProperty({
-            description: 'To show new application',
-            type: 'Boolean',
-           example: 'True or False',
-          })
-          @IsString()
-          readonly status: boolean;
+        // @ApiProperty({
+        //     description: 'To show new application',
+        //     type: 'Boolean',
+        //    example: 'True or False',
+        //   })
+        //   @IsString()
+        //   readonly status: boolean;
           @ApiProperty({
             description: 'Resume file link',
             type: 'string',
-            example: 'Link of the resume with combination of file name in link',
+            example: 'Resume.pdf',
           })
           @IsString()
           readonly resume: string;
@@ -45,13 +45,13 @@ export class ApplicationsDto{
           @IsString()
           readonly message: string;
 
-          @ApiProperty({
-            description: 'Alumni can star the application from a student',
-            type: 'boolean',
-            example: 'True or False',
-          })
-          @IsString()
-          readonly star: boolean;
+          // @ApiProperty({
+          //   description: 'Alumni can star the application from a student',
+          //   type: 'boolean',
+          //   example: 'True or False',
+          // })
+          // @IsString()
+          // readonly star: boolean;
 
           @ApiProperty({
             description: 'remark can be added by alumni',

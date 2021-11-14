@@ -89,7 +89,15 @@ export class ProfileDto {
   })
   @IsArray()
   readonly skills: Skills[];
- 
+  
+  @ApiProperty({
+    description: 'Type',
+    type: 'string',
+    example:"student"
+  })
+  @IsString()
+  readonly utype: string;
+  
   @ApiProperty({
     description: 'accomplishments',
     type: 'simple-array',

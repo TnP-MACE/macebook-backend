@@ -22,24 +22,28 @@ export class PostsController {
     }
 
     @Get()
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     getallposts():Promise<any>{
         return this.postservice.getallposts();
     }
 
     @Get('/search')
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     searchpost(@Query() topicdto:GetPostByTopic):Promise<any>{
         return this.postservice.searchpost(topicdto)
     }
 
     @Get('/topic')
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     getpostbytopic(@Query() topicdto:GetPostByTopic):Promise<any>{
         return this.postservice.getpostbytopic(topicdto)
     }
 
     @Get('/:post_id')
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Search Post' })
     @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } }) 
@@ -50,22 +54,28 @@ export class PostsController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
+    @ApiBearerAuth()
     InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser): Promise <any> {
         return this.postservice.insertpost(postdto,req.user.uid)
     }
 
     @Patch('/update_post/:post_id')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     UpdatePost(@Param('post_id') post_id:string,@Body() updatepostdto:UpdatePostDto):Promise<any>{
         return this.postservice.updatepost(post_id,updatepostdto)
     }
 
     @Delete('/:post_id')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
     DeletePost(@Param() post_id:string):Promise<any>{
         return this.postservice.deletepost(post_id)
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Post('/like/:id')
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Like post ' })
       @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
     likepost(@Req() req:RequestWithUser,@Param() params):Promise<any>{
@@ -77,6 +87,7 @@ export class PostsController {
       @UseGuards(AuthGuard('jwt'))
       @Post('/picture/:post_id')
       @ApiOperation({ summary: 'Upload post image' })
+      @ApiBearerAuth()
       @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
      @ApiConsumes('multipart/form-data')
       @ApiBody({
@@ -106,6 +117,7 @@ export class PostsController {
       // UPDATE POST IMAGE
       @UseGuards(AuthGuard('jwt'))
       @Patch('/picture/:post_id')
+      @ApiBearerAuth()
       @ApiOperation({ summary: 'Update post image' })
       @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
      @ApiConsumes('multipart/form-data')
@@ -136,6 +148,7 @@ export class PostsController {
       //DELETE POST IMAGE
       @UseGuards(AuthGuard('jwt'))
       @Delete('/picture/:post_id')
+      @ApiBearerAuth()
       @ApiOperation({ summary: 'delete post image' })
       @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
      @ApiConsumes('multipart/form-data')

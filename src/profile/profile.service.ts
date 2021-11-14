@@ -45,7 +45,7 @@ export class ProfileService {
   }
   async getOneprofileDetail(profile_id: string,my_id:string): Promise<any> {
     var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
-    if(my_id!=null){
+
       if(my_id===profile_id)
       var connection_status="me";
       else{
@@ -64,9 +64,6 @@ export class ProfileService {
         else
           var connection_status="connect";
       }
-    }else{
-      console.log("what just happened: Error is at getOneprofileDetail service function");
-    }
     return {profile:profile,
     
     connection_status:connection_status};
@@ -75,7 +72,7 @@ export class ProfileService {
   async insertprofile(data: any,profile_id:string): Promise<any> {
     try {
       var skills = data["skills"]
-      data.utype = "student"
+      data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);
@@ -108,7 +105,7 @@ export class ProfileService {
   async updateprofile(data: any,profile_id:string): Promise<any> {
     try {
       var skills = data["skills"]
-      data.utype = "student"
+      data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);
@@ -187,6 +184,15 @@ export class ProfileService {
   async uploadprofileimage(profile_id: string, url: string): Promise<any> {
 
     try {
+      var profile = await this.profileRepository.find({profile_id: profile_id})
+      if(profile[0].profile_image_url){
+        try {
+          fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
       var user = {
         profile_id: profile_id,
         profile_image_url: url
@@ -211,6 +217,15 @@ export class ProfileService {
   async uploadcoverimage(profile_id: string, url: string): Promise<any> {
 
     try {
+      var profile = await this.profileRepository.find({profile_id: profile_id})
+      if(profile[0].cover_url){
+        try {
+          fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
       var user = {
         profile_id: profile_id,
         cover_url: url
