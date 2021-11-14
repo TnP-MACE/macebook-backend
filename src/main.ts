@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   console.log(join(__dirname,'..','uploads'))
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: '*',
     credentials: true,
   })
   app.use(cookieParser());
@@ -19,7 +19,7 @@ async function bootstrap() {
       .setTitle('Macebook Server')
       .setDescription('TnP MACE')
       .setVersion('1.0.0')
-      .addBearerAuth()
+      .addBearerAuth({ type:'http'})
       .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('api-doc', app, swaggerDocument);
