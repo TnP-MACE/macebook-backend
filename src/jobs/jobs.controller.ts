@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, Ap
 export class JobsController {
     constructor(private readonly jobsService: JobsService) {
     }
+    @ApiBearerAuth()
     @Get('')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'To get complete job in the database'})
@@ -21,6 +22,7 @@ export class JobsController {
     FindJobs(): Promise<any> { 
         return this.jobsService.getJobDetails() 
     }
+    @ApiBearerAuth()
     @Get('/s/:job_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'To get details of one job' })
@@ -28,7 +30,7 @@ export class JobsController {
     FindOneJob(@Param() job_id:string): Promise<any> { 
         return this.jobsService.getOneJobDetails(job_id) 
     }
-
+    @ApiBearerAuth()
     @Get('/search')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Search job' })
@@ -37,7 +39,7 @@ export class JobsController {
         console.log(jobsearch)
         return this.jobsService.searchJobDetails(jobsearch) 
     }
-
+    @ApiBearerAuth()
     @Get('/alumni_job/:alumni_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Return the complete job posted by the alumni and complete applications in each job including the student name and student id' })
@@ -45,7 +47,7 @@ export class JobsController {
     AlumniJob(@Param() param): Promise<any> { 
         return this.jobsService.AlumniJobDetails(param.alumni_id) 
     }   
-
+    @ApiBearerAuth()
     @Post('/add')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Add one job' })
@@ -53,8 +55,7 @@ export class JobsController {
     AddJob(@Body() jobDto:JobsDto): Promise<any> { 
         return this.jobsService.insertjob(jobDto) 
     }
-
-    
+    @ApiBearerAuth()
     @Post('/applications/:job_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'To insert application where student can add resume whenever required' })
@@ -84,8 +85,7 @@ export class JobsController {
     AddApplication(@Param() param,@Body() applicationDto:ApplicationsDto,@UploadedFile() file: Express.Multer.File) { 
         return this.jobsService.insertapplication(applicationDto,file.filename,param.job_id)
     }
-
-
+    @ApiBearerAuth()
     @Patch('/remarks/:application_id') 
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Search Post' })
@@ -94,10 +94,7 @@ export class JobsController {
         console.log(param)
         return this.jobsService.addremarks(applicationDto,param.application_id) 
     }
-
-
-    
-
+    @ApiBearerAuth()
     @Patch('/alumni_job/:application_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'an change the status. staus used to show new application count ' })
@@ -108,7 +105,7 @@ export class JobsController {
         }
         return this.jobsService.ChangeStatus(param.application_id ,data) 
     }
-
+    @ApiBearerAuth()
     @Get('/resume/:application_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Can be used to select resume' })
@@ -116,8 +113,7 @@ export class JobsController {
     GetResume(@Param() param): Promise<any> { 
         return this.jobsService.selectresume(param.application_id) 
     }
-
-    
+    @ApiBearerAuth()
     @Delete('j/:job_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Delete the job posted by alumni' })
@@ -125,8 +121,7 @@ export class JobsController {
     DeleteoneJob(@Param() job_id:string):Promise<any> { 
         return this.jobsService.deletejob(job_id) 
     }
-  
-
+    @ApiBearerAuth()
     @Delete('/applications/:application_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Delete Application' })
@@ -135,7 +130,7 @@ export class JobsController {
         console.log(param.application_id)
         return this.jobsService.deleteapplication(param.application_id)
     }
-
+    @ApiBearerAuth()
     @Delete('/resume/:application_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Search Post' })
@@ -143,7 +138,7 @@ export class JobsController {
     DeleteResume(@Param() param):Promise<any>{
         return this.jobsService.deleteresume(param.application_id)
     }
-
+    @ApiBearerAuth()
     @Patch('/job/:job_id')
     @UseGuards(AuthGuard('jwt'))
     @ApiOperation({ summary: 'Update job' })
