@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, MaxLength, ValidateNested } from 'class-validator';
 import Skills from '../entities/skills.entity';
 
 export class ExperienceDto {
@@ -52,7 +52,7 @@ export class ExperienceDto {
     type: 'string',
     example:{month:'April',year:2000}
   })
-  @IsString()
+  @ValidateNested({each:true})
   readonly start_time:{month:string,year:number};
 
   @ApiProperty({
@@ -60,6 +60,6 @@ export class ExperienceDto {
     type: 'simple-json',
     example:{month:'April',year:2000}
   })
-  @IsString()
+  @ValidateNested({each:true})
   readonly end_time:{month:string,year:number};
 }

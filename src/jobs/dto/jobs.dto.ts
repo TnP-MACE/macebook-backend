@@ -23,12 +23,12 @@ export class JobsDto{
         @IsString()
         readonly job_name: string;
         @ApiProperty({
-            description: 'Job Description',
+            description: 'Job Type',
             type: 'string',
-           example: 'Like Needed full stack developer having skills in React,node,MongoDb',
+           example: 'full time, 1-2 year experience',
           })
           @IsString()
-          readonly job_description: string;
+          readonly job_type: string;
           @ApiProperty({
             description: 'Job Details',
             type: 'string',
@@ -37,5 +37,28 @@ export class JobsDto{
           @IsString()
           readonly job_details: string;
         
-      
+          @ApiProperty({
+            description: 'Company name',
+            type: 'string',
+            example: 'Apple facebook',
+          })
+          @IsString()
+          readonly company_name: string;
+
+          @ApiProperty({
+            description: 'skills',
+            type: 'list',
+            example: 'C python',
+          })
+          @IsString()
+          readonly skills: string;
+
+          @ApiProperty({
+            description: 'Address of company',
+            type: 'string',
+            example: 'Sanfransisco, California',
+          })
+          @IsString()
+          readonly address: string;
+          
 }

@@ -23,12 +23,12 @@ export class CommentsService {
   ) { }
   async insertcomment(data: any,post_id: string,user_id:string): Promise<any> {
 
+    console.log(user_id)
 
     try {
-      console.log(data)
       const post = await this.postRepository.findOne(post_id)
-      const user = await this.userRepository.findOne({ where: { uid: data.user_id } })
-      const profile=await this.profileRepository.findOne({where:{profile_id:user.uid}})
+      const user = await this.userRepository.findOne({ where: { uid: user_id} })
+      const profile=await this.profileRepository.findOne({where:{profile_id:user_id}})
       
       if (post != null && user != null) {
         const comment= new Comments();

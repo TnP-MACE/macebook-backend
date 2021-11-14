@@ -13,198 +13,200 @@ const fs = require('fs')
 
 @Injectable()
 export class PostsService {
-    constructor(
-        @InjectRepository(Posts)
-        private readonly postrepository:Repository<Posts>,
-        @InjectRepository(Profile)
-        private readonly profilerepository:Repository<Profile>,
-        @InjectRepository(User)
-        private readonly userrepository:Repository<User>
+  constructor(
+    @InjectRepository(Posts)
+    private readonly postrepository: Repository<Posts>,
+    @InjectRepository(Profile)
+    private readonly profilerepository: Repository<Profile>,
+    @InjectRepository(User)
+    private readonly userrepository: Repository<User>
 
-   
-        ){}
-       
 
-    async getallposts():Promise<any>{
-        const query=this.postrepository.createQueryBuilder();
-        const posts=query.getMany()
-        return posts;
+  ) { }
+
+
+  async getallposts(): Promise<any> {
+    const query = this.postrepository.createQueryBuilder('post');
+    const posts = query.select().orderBy('post.createdDate', 'DESC').getMany()
+    return posts;
+  }
+
+  async searchpost(topicdto: GetPostByTopic): Promise<any> {
+    const query = this.postrepository.createQueryBuilder('post');
+    const { search } = topicdto;
+
+    if (search) {
+      query.andWhere(
+        'post.text LIKE :search OR post.topic LIKE :search', { search: `%${search}%` }
+      );
+
     }
 
-   async searchpost(topicdto:GetPostByTopic):Promise<any>{
-       const query=this.postrepository.createQueryBuilder('post');
-       const {search}=topicdto;
-      
-       if(search){
-           query.andWhere(
-            'post.text LIKE :search OR post.topic LIKE :search',{search:`%${search}%`}
-           );
-           
-       }
-    
-       const posts=await query.getMany();
-       return posts;
-
-   }
-   async getpostbytopic(topicdto:GetPostByTopic):Promise<any>{
-    const query=this.postrepository.createQueryBuilder('post');
-    const {topic}=topicdto;
-    if(topic){
-        query.andWhere('post.topic = :topic',{topic});
-    }
-   
- 
-    const posts=await query.getMany();
+    const posts = await query.getMany();
     return posts;
 
-}
-
-
-   async getsinglepost(post_id:string):Promise<Posts>{
-       const post=await this.postrepository.findOne(post_id);
-       if(!post){
-           throw new NotFoundException();
-       }
-       return post;
-       
-   }
-
-   async insertpost(data:PostsDto,user_id:string):Promise<any>{
-       console.log(data)
-       try{
-        //const post = await this.postRepository.findOne(post_id)
-        const user = await this.userrepository.findOne({ where: { uid: user_id } })
-        console.log(user)
-        const profile=await this.profilerepository.findOne({where:{profile_id:'0a499666-75ec-42f3-9bf1-b1a8c978dabd'}})
-       console.log(profile)
-       const {topic,text}=data;
-        const post=this.postrepository.create({
-            topic,
-            text,
-            likes:[],
-            comments:[],
-            
-
-        })
-        post.profile=profile;
-
-        console.log(post)
-        
-        await this.postrepository.save(post);
-        return{
-            post,
-            sucess:true,
-            message:'post ids uploded',
-        };
-    }catch(err){
-        console.log(err,'err');
-        return{
-            sucess:true,
-            message:'post is uploaded'
-        };
-
-    }
-    
-          
-    
-        
-        
-   }
-
-   async updatepost(post_id:string,updatepostdto:UpdatePostDto):Promise<any>{
-       console.log(updatepostdto);
-       try{
-         const{topic,text}=updatepostdto;
-         const post=await this.getsinglepost(post_id);
-         post.topic=topic;
-         post.text=text;
-         await this.postrepository.save(post);
-         
-       
-       return{
-           post,
-           success:true,
-           message:'Post is updated'
-       };
-    }catch(err){
-        console.log('err',err);
-        return{
-            success:false,
-            message:'post is not updated'
-        };
+  }
+  async getpostbytopic(topicdto: GetPostByTopic): Promise<any> {
+    const query = this.postrepository.createQueryBuilder('post');
+    const { topic } = topicdto;
+    if (topic) {
+      query.andWhere('post.topic = :topic', { topic });
     }
 
-   }
 
-   async deletepost(post_id:string):Promise<any>{
-       try{
-           
-           const result =await this.postrepository.delete(post_id);
-           if (result.affected===0){
-            throw new NotFoundException(`Task with ID "${post_id}" not found`);
-           }
-           return{
-               success:true,
-               message:'post deleted successfully'
+    const posts = await query.getMany();
+    return posts;
 
-           };
-        
-        
-        }catch(err){
-               console.log('err',err);
-               return{
-                   sucess:false,
-                   message:'post is not deleted'
-            
+  }
 
-               }
-           }
-      
-   }
 
-   async likepost(post_id:string,user_id:string):Promise<any>{
-       try{
-           const post=await this.getsinglepost(post_id)
-           if(post.likes.some(like => like === user_id)){
-                post.likes.splice(post.likes.indexOf(user_id),1);
-                return await this.postrepository.save(post)
-           }
-           else{
-               post.likes.push(user_id);
-               return await this.postrepository.save(post);
-           }
-       }catch(err){
-           throw(err)
-       }
+  async getsinglepost(post_id: string): Promise<Posts> {
+    const post = await this.postrepository.findOne(post_id);
+    if (!post) {
+      throw new NotFoundException();
+    }
+    return post;
 
-    
+  }
 
-   }
-   
-   async uploadpostphoto(post:any,image_name:string):Promise<any>{
+  async insertpost(data: PostsDto, user_id: string): Promise<any> {
+    console.log(data)
     try {
-        var user = {
-          post_id: post.post_id,
-          post_image_name: image_name
-        }
-        await this.postrepository.save(user)
-        return {
-          success: true,
-          message: 'post picture is  updated'
-        }
-  
-  
-      } catch (err) {
-        console.log('err', err);
-        return {
-          success: false,
-          message: 'Post image not inserted',
-        };
+      //const post = await this.postRepository.findOne(post_id)
+      const user = await this.userrepository.findOne({ where: { uid: user_id } })
+      console.log(user)
+      const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
+      console.log(profile)
+      const { topic, text } = data;
+      const post = this.postrepository.create({
+        topic,
+        text,
+        likes: [],
+        comments: [],
+
+
+      })
+      post.profile = profile;
+
+      console.log(post)
+
+      await this.postrepository.save(post);
+      return {
+        post,
+        sucess: true,
+        message: 'post ids uploded',
+      };
+    } catch (err) {
+      console.log(err, 'err');
+      return {
+        sucess: true,
+        message: 'post is uploaded'
+      };
+
+    }
+
+
+
+
+
+  }
+
+  async updatepost(post_id: string, updatepostdto: UpdatePostDto): Promise<any> {
+    console.log(updatepostdto);
+    try {
+      const { topic, text } = updatepostdto;
+      const post = await this.getsinglepost(post_id);
+      post.topic = topic;
+      post.text = text;
+      await this.postrepository.save(post);
+
+
+      return {
+        post,
+        success: true,
+        message: 'Post is updated'
+      };
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'post is not updated'
+      };
+    }
+
+  }
+
+  async deletepost(post_id: string): Promise<any> {
+    try {
+
+      const result = await this.postrepository.delete(post_id);
+      if (result.affected === 0) {
+        throw new NotFoundException(`Task with ID "${post_id}" not found`);
+      }
+      return {
+        success: true,
+        message: 'post deleted successfully'
+
+      };
+
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        sucess: false,
+        message: 'post is not deleted'
+
+
+      }
+    }
+
+  }
+
+  async likepost(post_id: string, user_id: string): Promise<any> {
+    try {
+      const post = await this.getsinglepost(post_id)
+      if (post.likes.some(like => like === user_id)) {
+        post.likes.splice(post.likes.indexOf(user_id), 1);
+        return await this.postrepository.save(post)
+      }
+      else {
+        post.likes.push(user_id);
+        return await this.postrepository.save(post);
+      }
+    } catch (err) {
+      throw (err)
+    }
+
+
+
+  }
+
+  async uploadpostphoto(post: any, image_name: string,user_id:string): Promise<any> {
+    try {
+      const profile=await this.profilerepository.findOne({where:{profile_id:user_id}});
+      var user = {
+        post_id: post.post_id,
+        post_image_name: image_name,
+        profile:profile
+      }
+      await this.postrepository.save(user)
+      return {
+        success: true,
+        message: 'post picture is  updated'
       }
 
-   }
 
-   async updatepostimage(post_id: any, image_name: string): Promise<any> {
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'Post image not inserted',
+      };
+    }
+
+  }
+
+  async updatepostimage(post_id: any, image_name: string): Promise<any> {
 
     try {
       var postdata = await this.postrepository.findOne(post_id);
@@ -240,7 +242,7 @@ export class PostsService {
       };
     }
 
-    
+
 
 
 
@@ -261,9 +263,9 @@ export class PostsService {
         console.error(err)
       }
       /* var profiledatas = await this.postrepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profile.profile_id }).execute() */
-      var user={
-          post_id:postdata.post_id,
-          post_image_url:null
+      var user = {
+        post_id: postdata.post_id,
+        post_image_url: null
 
       }
       this.postrepository.save(user);
@@ -279,7 +281,7 @@ export class PostsService {
       };
     }
   }
- 
 
-   
+
+
 }

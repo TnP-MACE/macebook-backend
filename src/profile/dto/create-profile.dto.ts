@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength } from 'class-validator';
+import { IsArray, IsString, MaxLength, ValidateNested } from 'class-validator';
 import Skills from '../entities/skills.entity';
 
 export class ProfileParameter{
@@ -21,7 +21,7 @@ export class ProfileDto {
     type: 'list',
     example:{admission_no:'B18CS008',branch:'CSE',batch:'2019'}
   })
-  @IsString()
+  @ValidateNested({ each: true })
   readonly admission: { admission_no: string,branch:string, batch: string };
   
   @ApiProperty({
@@ -38,7 +38,7 @@ export class ProfileDto {
     type: '"simple-json"',
     example:{ personal_url:"www.sad.com", linkedin: "www.sad.com", facebook: "www.sad.com",github: "www.sad.com" }
   })
-  @IsString()
+  @ValidateNested({ each: true })
   readonly urls: { personal_url:string, linkedin: string, facebook: string,github: string };
 
   @ApiProperty({
@@ -55,7 +55,7 @@ export class ProfileDto {
     type: 'simple-json',
     example:{ place:"Hello", district: "KTM", state: "Kerala",country: "India" }
   })
-  @IsString()
+  @ValidateNested({ each: true })
   readonly address: { place:string, district: string, state: string,country: string };
 
   @ApiProperty({
@@ -87,7 +87,7 @@ export class ProfileDto {
     type: 'simple-array',
     example:["CSS","HTML"]
   })
-  @IsString()
+  @IsArray()
   readonly skills: Skills[];
  
   @ApiProperty({
@@ -95,6 +95,6 @@ export class ProfileDto {
     type: 'simple-array',
     example:["CSS","HTML"]
   })
-  @IsString()
+  @IsArray()
   readonly accomplishments: string[];
 }

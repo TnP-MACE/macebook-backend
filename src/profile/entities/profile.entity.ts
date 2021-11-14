@@ -9,6 +9,7 @@ import {
   OneToOne,
   JoinColumn
 } from 'typeorm';
+import Applications from '../../jobs/entities/applications.entity';
 import Connections from './connections.entity';
 import Experience from './experience.entity';
 import Skills from './skills.entity';
@@ -81,6 +82,9 @@ export default class Profile {
 
   @OneToOne(() => User, user => user.profile) // specify inverse side as a second parameter
     user: User;
+  
+    @OneToMany(()=>Applications, (applications)=>applications.profile,{nullable:false})
+    applications:Applications[]
 
 }
 export class ProfileSwagger extends Profile {}

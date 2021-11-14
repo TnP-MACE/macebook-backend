@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { getManager, Repository } from "typeorm";
 import Profile from './entities/profile.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
@@ -20,8 +20,22 @@ export class ProfileService {
     @InjectRepository(Experience)
     private readonly experienceRepository: Repository<Experience>
   ) { }
-  async getProfileDetails(): Promise<any> {
-    const profile = await this.profileRepository.find();
+  async getProfileDetails(key:string): Promise<any> {
+    var sample="";
+    const myArray=key.toLowerCase().split(" ");
+      for(var i=0;i<myArray.length;i++){
+        if(i==myArray.length-1){
+          sample+=`LOWER(fullname) like '%`+myArray[i]+`%' `; 
+        }else{
+          sample+=`LOWER(fullname) like '%`+myArray[i]+`%' or `;
+        }}
+        console.log(sample)
+      const entityManager = getManager();
+      const profile =  await entityManager.query(`
+      SELECT 
+        profile_id, fullname
+      FROM "Profile" where ${sample};
+      `);
     return profile;
   }
   async getProfileDetailsbyKey(key:string): Promise<any> {
@@ -29,9 +43,33 @@ export class ProfileService {
     var profile;
     return profile;
   }
-  async getOneprofileDetail(profile_id: string): Promise<any> {
+  async getOneprofileDetail(profile_id: string,my_id:string): Promise<any> {
     var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
-    return profile;
+    if(my_id!=null){
+      if(my_id===profile_id)
+      var connection_status="me";
+      else{
+        var conn = await this.connectionRepository.createQueryBuilder("connection").leftJoin("connection.connection_memberid","cmember_id").addSelect("cmember_id.profile_id").where("connection.connection_memberid=:my_id and connection.member_id=:profile_id  or connection.connection_memberid=:profile_id and connection.member_id=:my_id  ",{ my_id:my_id,profile_id: profile_id}).getOne()
+        if(conn!=null){
+          if(conn.status=== 'connect'){
+            var connection_status="connected";
+          }
+          else{
+            if(conn.connection_memberid.profile_id===my_id)
+              var connection_status="Invited";
+            else
+              var connection_status="Accept";
+          }
+        }
+        else
+          var connection_status="connect";
+      }
+    }else{
+      console.log("what just happened: Error is at getOneprofileDetail service function");
+    }
+    return {profile:profile,
+    
+    connection_status:connection_status};
   }
 
   async insertprofile(data: any,profile_id:string): Promise<any> {
@@ -102,7 +140,28 @@ export class ProfileService {
   async deleteprofile(profile_id: string): Promise<any> {
     try {
       console.log(profile_id);
-      await this.profileRepository.delete(profile_id)
+      
+      const profile=await this.profileRepository.find({profile_id:profile_id});
+      
+      if(profile[0].profile_image_url){
+        try {
+          fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      if(profile[0].cover_url){
+        try{
+          fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
+          //file removed
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      await this.profileRepository.delete({profile_id:profile_id});
+
+      console.log(profile);
       return {
         success: true,
         message: 'Successfully deleted',
@@ -296,8 +355,8 @@ export class ProfileService {
       } catch (err) {
         console.error(err)
       }
-      var profiledatas = await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profile.profile_id }).execute()
-
+      var profiledatas = await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profiledata.profile_id }).execute()
+console.log(profiledatas)
       return {
         success: true,
         message: 'Successfully deleted profile image',
@@ -479,7 +538,7 @@ export class ProfileService {
       try {
         var user_details = await this.profileRepository.findOne(user.id)
         var current_User_details = await this.profileRepository.findOne(current_User)
-        await this.connectionRepository.createQueryBuilder().delete().where({ connected_profile: user_details, profile: current_User_details, status: "invite" }).execute()
+        await this.connectionRepository.createQueryBuilder().delete().where({ member_id: user_details, connection_memberid: current_User_details, status: "invite" }).execute()
         return {
           success: true,
           message: 'Cancelled',

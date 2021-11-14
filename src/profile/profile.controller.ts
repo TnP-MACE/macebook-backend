@@ -19,24 +19,26 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {
   }
 
-  @Get('/')
-  @ApiOperation({ summary: 'Get All Profile' })
-  Findprofile(): Promise<any> {
-    return this.profileService.getProfileDetails()
+  @Get('/all/:key')
+  @ApiOperation({ summary: 'Get All Profile by key' })
+  @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
+
+  Findprofile(@Param() param: any): Promise<any> {
+    return this.profileService.getProfileDetails(param.key)
   }
   @Get('/search/:key')
-  @ApiOperation({ summary: 'Search Profile' })
+  @ApiOperation({ summary: 'Search Profile -don"t use' })
   @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
   Searchprofile(@Param() param: any): Promise<any> {
-    return this.profileService.getProfileDetails()
+    return this.profileService.getProfileDetails(param.key)
   }
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/p1')
+
+  @Get('/p1/:id')
   @ApiOperation({ summary: 'Get Profile by id' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
-  FindOneProfile(@Req() req:RequestWithUser): Promise<any> {
-    console.log(req.user.uid);
-    return this.profileService.getOneprofileDetail(req.user.uid)
+  @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+  FindOneProfile(@Param() param:any,@Body() body:any): Promise<any> {
+
+    return this.profileService.getOneprofileDetail(param.id,body.id)
   }
   //     @Get('/p2/:profile_id')
   //     @ApiOperation({ summary: 'Get Profile by id' })
@@ -55,7 +57,6 @@ export class ProfileController {
   @Patch('/updation')
   @ApiOperation({ summary: 'Update Profile' })
   PutProfile(@Body() profileDto: ProfileDto, @Req() req: RequestWithUser) {
-    console.log(req.user.uid)
     return this.profileService.updateprofile(profileDto,req.user.uid);
   }
   @UseGuards(AuthGuard('jwt'))
@@ -83,7 +84,7 @@ export class ProfileController {
       properties: {
         profilepicture: {
           type: 'string',
-          format: 'jpg',
+          format: 'binary',
         },
       },
     },
