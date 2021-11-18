@@ -43,7 +43,7 @@ export class CreateUserDto {
     message: 'too weak password',
   })
   @IsString()
-  @MinLength((8))
+  @MinLength(8)
   @MaxLength(128)
   password: string;
   
