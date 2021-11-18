@@ -61,7 +61,7 @@ export class ProfileController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Delete('')
-  @ApiOperation({ summary: 'Get Profile details> Will not be used' })
+  @ApiOperation({ summary: 'Delete Profile details> Will not be used' })
   DeleteProfile(@Req() req: RequestWithUser): Promise<any> {
     return this.profileService.deleteprofile(req.user.uid);
   }

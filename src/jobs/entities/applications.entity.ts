@@ -47,6 +47,6 @@ import Jobs from './jobs.entity';
     @ManyToOne(() => Jobs, (jobs) => jobs.applications, { nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
     jobs: Jobs;
    
-    @ManyToOne(() => Profile, (profile) => profile.applications, { nullable: true, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+    @ManyToOne(() => Profile, (profile) => profile.applications, { nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
     profile: Profile;
   }

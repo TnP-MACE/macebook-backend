@@ -24,11 +24,11 @@ export class JobsDto{
         readonly job_name: string;
         @ApiProperty({
             description: 'Job Type',
-            type: 'string',
-           example: ["Full Time","1 year Experience"],
+            type: 'list',
+           example: '["Full Time","1 year Experience"]',
           })
-          @IsString()
-          readonly job_type: string;
+          @IsArray()
+          readonly job_type: string[];
           @ApiProperty({
             description: 'Job Details',
             type: 'string',
@@ -56,7 +56,7 @@ export class JobsDto{
           @ApiProperty({
             description: 'skills',
             type: 'list',
-            example: ["C++","java","python"],
+            example: '["C++","java","python"]',
           })
           @IsArray()
           readonly skills: string[];
@@ -70,7 +70,7 @@ export class JobsDto{
           },
           })
           @ValidateNested()
-          readonly address: {state:string,city:string};
+          readonly address: '{state:string,city:string}';
     
           @ApiProperty({
             description: 'Domain of company',

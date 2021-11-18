@@ -38,8 +38,8 @@ export default class Profile {
   @Column("simple-json",{nullable:true})
   address:{ place:string, district: string, state: string,country: string };
 
-  @Column({nullable: true})
-  utype: string;              //alumini or student
+  // @Column({nullable: true})
+  // utype: string;              //alumini or student
 
   @Column({ nullable: true })
   profile_image_url: string;

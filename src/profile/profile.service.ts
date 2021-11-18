@@ -72,7 +72,7 @@ export class ProfileService {
   async insertprofile(data: any,profile_id:string): Promise<any> {
     try {
       var skills = data["skills"]
-      data.utype = data.utype
+      // data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);
@@ -105,7 +105,7 @@ export class ProfileService {
   async updateprofile(data: any,profile_id:string): Promise<any> {
     try {
       var skills = data["skills"]
-      data.utype = data.utype
+      // data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
       var profile = await this.profileRepository.save(data);

@@ -97,17 +97,9 @@ export class JobsService {
       var sample="";
    
 
-      const myArray=data.jobsearch.toLowerCase().split(" ");
-      // for(var i=0;i<myArray.length;i++){
-      //   if(i==myArray.length-1){
-      //     sample+='job_name like'+' %'+myArray[i]+'% '+'or company_name like'+' %'+myArray[i]+'% '; 
-      //   }else{
-      //     sample+='job_name like'+' %'+myArray[i]+'% '+ 'or company_name like'+' %'+myArray[i]+'% and ';
-      //   }
-        
-      // }
-      // // const job = await this.jobsRepository.createQueryBuilder('Jobs').where(sample).getMany();
-      // const job = await this.jobsRepository.createQueryBuilder('Jobs').where('job_name like :name ',{name:'%'+myArray[1]+'%'}).getMany();
+      // const myArray=data.jobsearch.search.toLowerCase().split(" ");
+      const myArray=data.toLowerCase().split(" ");
+
       for(var i=0;i<myArray.length;i++){
         if(i==myArray.length-1){
           sample+=`LOWER(job_name) like '%`+myArray[i]+`%' `+`or LOWER(company_name) like '%`+myArray[i]+`%' `; 
@@ -123,11 +115,6 @@ export class JobsService {
         *
       FROM "Jobs" where ${sample};`);
 
-      // const job = entityManager.query(`
-      // SELECT 
-      //   *
-      // FROM "Jobs" where ${sample};
-      // `,myArray);
       return job;
       // }
 
@@ -139,53 +126,11 @@ export class JobsService {
       };
     }
   }
-  // async getProfileDetails(key:string): Promise<any> {
-  //   var sample="";
-   
-
-  //     const myArray=key.toLowerCase().split(" ");
-      // for(var i=0;i<myArray.length;i++){
-      //   if(i==myArray.length-1){
-      //     sample+='job_name like'+' %'+myArray[i]+'% '+'or company_name like'+' %'+myArray[i]+'% '; 
-      //   }else{
-      //     sample+='job_name like'+' %'+myArray[i]+'% '+ 'or company_name like'+' %'+myArray[i]+'% and ';
-      //   }
-        
-      // }
-      // // const job = await this.jobsRepository.createQueryBuilder('Jobs').where(sample).getMany();
-      // const job = await this.jobsRepository.createQueryBuilder('Jobs').where('job_name like :name ',{name:'%'+myArray[1]+'%'}).getMany();
-      // for(var i=0;i<myArray.length;i++){
-      //   if(i==myArray.length-1){
-      //     sample+=`LOWER(fullname) like '%`+myArray[i]+`%' `; 
-      //   }else{
-      //     sample+=`LOWER(fullname) like '%`+myArray[i]+`%' or `;
-      //   }}
-      //   console.log(sample)
-      // const entityManager = getManager();
-      // const profile =  await entityManager.query(`
-      // SELECT 
-      //   profile_id, fullname
-      // FROM "Profile" where ${sample};
-      // `);
-// console.log(profile)
-//     // const profile = await this.profileRepository.find();
-//     return profile;
-//   }
+  
   async AlumniJobDetails(alumni_id:string): Promise<any> {
     console.log(alumni_id)
     const entityManager = getManager();
-    // const job=entityManager.query(`select * from "Jobs" where uid;`,alumni_id)
-    // const job = await this.jobsRepository.createQueryBuilder('Jobs').leftJoin("Applications").a.where('uid= :alumni_id ',{alumni_id:alumni_id}).getMany();
-//     const job = entityManager.query(`
-//     SELECT j.*,count(select a.* from Applications a where a.job_id = j.job_id ) as c  from  "Jobs" j
-// WHERE j.uid = $1
-//     `,[alumni_id]);
 
-
-//     return job;
-    // var profile = await this.jobsRepository.createQueryBuilder("Jobs").leftJoinAndSelect("Jobs.applications","applications").where("Jobs.uid = :alumni_id", { alumni_id: alumni_id}).getMany()
-    // var profile = await this.jobsRepository.createQueryBuilder("Jobs").leftJoinAndSelect("Jobs.applications","applications").leftJoinAndSelect("Applications.profile","profile").where("Jobs.uid = :alumni_id and applications.student_id = Profile.profile_id", { alumni_id: alumni_id}).getMany()
-    // var profile = await this.jobsRepository.createQueryBuilder("Jobs").leftJoinAndSelect("Jobs.applications","applications").addSelect("applications.student_id").leftJoinAndSelect("profile.applications", "profile").where("Jobs.uid = :alumni_id and applications.student_id = profile.profile_id",{alumni_id}).getMany()
     var profile = await this.jobsRepository.createQueryBuilder("Jobs").leftJoinAndSelect("Jobs.applications","applications").leftJoin("applications.profile", "profile").addSelect("profile.fullname").addSelect("profile.profile_id").where("Jobs.uid = :alumni_id",{alumni_id}).getMany()
     return profile
   }
@@ -253,7 +198,8 @@ console.log(filename)
 
   async addremarks(data: any,id:any): Promise<any> {
     try {
-      console.log(data)
+      console.log(data.remarks)
+      console.log("Hikddncdksdcdkszdck,jn")
       this.applicationsRepository.createQueryBuilder().update(Applications).set(data).where("application_id = :application_id",{application_id:id}).execute();
           return {
           success: true,
@@ -271,8 +217,9 @@ console.log(filename)
   }
 
   async selectresume(application_id: string): Promise<any> {
-    const resume = await this.applicationsRepository.find({ where: application_id });
-    return resume;
+    const resume = await this.applicationsRepository.findOne(application_id);
+    var resume_url="./uploads/resume/"+resume.resume
+    return resume_url;
   }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -351,6 +298,26 @@ console.log(filename)
       return {
         success: false,
         message: 'Job not changed',
+      };
+    }
+  }
+
+  async updateapplication(id: any,filename:string,data:any): Promise<any> {
+    try {
+      console.log(data)
+      data.resume=filename
+      this.applicationsRepository.createQueryBuilder().update(Applications).set(data).where("application_id = :application_id",{application_id:id}).execute();
+          return {
+          success: true,
+          message: 'Application updated',
+        };
+  
+
+    } catch (err) {
+      console.log('err', err);
+      return {
+        success: false,
+        message: 'Application not changed',
       };
     }
   }
