@@ -12,7 +12,7 @@ export class LoginUserDto {
   
   @ApiProperty()
   @IsString()
-  @MinLength(14)
+  @MinLength(8)
   @MaxLength(128)
   @IsNotEmpty()
   password: string;
