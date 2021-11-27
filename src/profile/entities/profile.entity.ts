@@ -35,6 +35,9 @@ export default class Profile {
   @Column({ length: 1024, nullable: true })
   about: string;
 
+  @Column({ length: 20, default: "incomplete" })
+  status: string;
+
   @Column("simple-json",{nullable:true})
   address:{ place:string, district: string, state: string,country: string };
 

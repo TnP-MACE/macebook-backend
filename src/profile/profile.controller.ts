@@ -20,11 +20,17 @@ export class ProfileController {
   }
 
   @Get('/all/:key')
-  @ApiOperation({ summary: 'Get All Profile by key' })
+  @ApiOperation({ summary: 'Get All Profile by name' })
   @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
 
   Findprofile(@Param() param: any): Promise<any> {
     return this.profileService.getProfileDetails(param.key)
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/mystatus')
+  @ApiOperation({ summary: 'Get status about logged in user(Only works after login)-Like complete or not' })
+  GetMyProfileStatus(@Req() req: RequestWithUser): Promise<any> {
+    return this.profileService.returnStatus( req.user.uid);
   }
   @Get('/search/:key')
   @ApiOperation({ summary: 'Search Profile -don"t use' })
@@ -70,7 +76,7 @@ export class ProfileController {
 
 
 
-  // ed1e67bb-b7c6-4da9-a628-46db57167402
+
 
   // PROFILE AND COVER IMAGES
   @UseGuards(AuthGuard('jwt'))
