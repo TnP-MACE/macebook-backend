@@ -43,6 +43,23 @@ export class ProfileService {
     var profile;
     return profile;
   }
+  async returnStatus(profile_id:string): Promise<any> {
+    
+      try {
+        const entityManager = getManager();
+      const profile =  await entityManager.query(`
+      SELECT 
+        profile_id, status, fullname
+      FROM "Profile" where "profile_id" = '${profile_id}';
+      `);
+    return profile;
+      } catch (error) {
+        return{
+          status:"incomplete"
+
+        }
+      }
+  }
   async getOneprofileDetail(profile_id: string,my_id:string): Promise<any> {
     var profile = await this.profileRepository.createQueryBuilder("profile").leftJoin("profile.skills", "skills").addSelect("skills.skill").leftJoinAndSelect("profile.experience", "experience").where("profile.profile_id = :profile_id", { profile_id: profile_id }).getOne()
 
@@ -75,6 +92,7 @@ export class ProfileService {
       // data.utype = data.utype
       data.profile_id=profile_id
       delete data.skills
+      data.status="complete"
       var profile = await this.profileRepository.save(data);
       var skillarray = []
       if(skills){
@@ -184,14 +202,20 @@ export class ProfileService {
   async uploadprofileimage(profile_id: string, url: string): Promise<any> {
 
     try {
+      
       var profile = await this.profileRepository.find({profile_id: profile_id})
-      if(profile[0].profile_image_url){
-        try {
-          fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
-          //file removed
-        } catch (err) {
-          console.error(err)
+      console.log(profile.length==0)
+      if(profile.length!=0){
+        if(profile[0].profile_image_url){
+          try {
+            fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
+            //file removed
+          } catch (err) {
+            console.error(err)
+          }
         }
+        
+
       }
       var user = {
         profile_id: profile_id,
@@ -218,12 +242,14 @@ export class ProfileService {
 
     try {
       var profile = await this.profileRepository.find({profile_id: profile_id})
-      if(profile[0].cover_url){
-        try {
-          fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
-          //file removed
-        } catch (err) {
-          console.error(err)
+      if(profile.length!=0){
+        if(profile[0].cover_url){
+          try {
+            fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
+            //file removed
+          } catch (err) {
+            console.error(err)
+          }
         }
       }
       var user = {
