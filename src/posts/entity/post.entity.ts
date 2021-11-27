@@ -37,6 +37,9 @@ export class Posts {
     @Column({nullable:true})
     post_username:string
 
+    @Column({nullable:true})
+    post_profile_image_name:string
+
 
 
     //Post-Comment(AR)
