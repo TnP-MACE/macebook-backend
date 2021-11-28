@@ -79,6 +79,7 @@ export class PostsService {
       const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
       console.log(profile)
       const { text } = data;
+      const profile_image_name=profile.profile_image_url
       const post = this.postrepository.create({
         
         text,
@@ -89,6 +90,7 @@ export class PostsService {
       })
       post.profile = profile;
       post.post_username=name
+      post.post_profile_image_name=profile_image_name
 
       console.log(post)
 
@@ -97,7 +99,7 @@ export class PostsService {
         post,
         
         sucess: true,
-        message: 'post ids uploded',
+        message: 'post is uploded',
       };
     } catch (err) {
       console.log(err, 'err');
