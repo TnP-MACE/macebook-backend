@@ -52,12 +52,43 @@ export class PostsController {
         return this.postservice.getsinglepost(post_id)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+/*     @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
     @ApiBearerAuth()
     InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser): Promise <any> {
         return this.postservice.insertpost(postdto,req.user.uid)
     }
+ */
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('/add_post')
+    @ApiBearerAuth()
+    @ApiConsumes('multipart/form-data')
+      @ApiBody({
+        schema: {
+          type: 'object',
+          properties: {
+            postimage: {
+              type: 'string',
+              format: 'binary',
+            },
+          },
+        },
+      })
+    @UseInterceptors(FileInterceptor('postimage', {
+      storage: diskStorage({
+          destination: './uploads/post',
+          filename: (req, file, cb) => {
+              const fileName = uuidv4();
+              return cb(null, `${fileName}${extname(file.originalname)}`);
+          }
+      })
+  }))
+    InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser, @UploadedFile() file: Express.Multer.File): Promise <any> {
+      console.log(postdto)
+        return this.postservice.insertpost(postdto,req.user.uid,file.filename)
+    }
+
 
     @Patch('/update_post/:post_id')
     @ApiBearerAuth()

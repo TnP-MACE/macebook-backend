@@ -68,7 +68,7 @@ export class PostsService {
     return post;
 
   }
-
+/* 
   async insertpost(data: PostsDto, user_id: string): Promise<any> {
     console.log(data)
     try {
@@ -108,7 +108,50 @@ export class PostsService {
         message: 'post is uploaded'
       };
 
-    }
+    } */
+    async insertpost(data: PostsDto, user_id: string,filename:string): Promise<any> {
+      console.log(data)
+      try {
+        //const post = await this.postRepository.findOne(post_id)
+        const user = await this.userrepository.findOne({ where: { uid: user_id } })
+        const name=user.username
+        console.log(user)
+        const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
+        console.log(profile)
+        const { text } = data;
+        const profile_image_name=profile.profile_image_url
+        const image_name=filename
+        const post = this.postrepository.create({
+          post_image_name:filename,
+          text,
+          likes: [],
+          comments: [],
+  
+  
+        })
+        post.profile = profile;
+        post.post_username=name
+        post.post_profile_image_name=profile_image_name
+  
+        console.log(post)
+  
+        await this.postrepository.save(post);
+        return {
+          post,
+          
+          sucess: true,
+          message: 'post is uploded',
+        };
+      } catch (err) {
+        console.log(err, 'err');
+        return {
+          sucess: true,
+          message: 'post is uploaded'
+        };
+  
+      }
+  
+  
 
 
 
