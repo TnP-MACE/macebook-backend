@@ -107,6 +107,8 @@ export class ProfileController {
   uploadProfileImage(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
     return this.profileService.uploadprofileimage(req.user.uid, file.filename);
   }
+
+  
   @UseGuards(AuthGuard('jwt'))
   @Post('/cover')
   @ApiOperation({ summary: 'Upload Cover image' })

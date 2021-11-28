@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   console.log(join(__dirname,'..','uploads'))
   app.enableCors({
-    origin: ['http://localhost:3000','https://mace-connect.herokuapp.com','https://zealous-kepler-913665.netlify.app','https://elated-poitras-25b86e.netlify.app'],
+    origin: ['http://localhost:3000','https://mace-connect.herokuapp.com','https://zealous-kepler-913665.netlify.app','https://elated-poitras-25b86e.netlify.app','http://127.0.0.1:5500'],
     credentials: true,
   })
   app.use(cookieParser());
