@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Any, In, Repository } from 'typeorm';
+import { Any, Connection, In, Repository } from 'typeorm';
 import { Posts } from './entity/post.entity';
 import { v4 as uuidv4 } from 'uuid'
 import { PostsDto } from './dto/create-post.dto';
@@ -30,6 +30,17 @@ export class PostsService {
     const posts = query.select().orderBy('post.createdDate', 'DESC').getMany()
     return posts;
   }
+
+    async getallposts_by_profile(uid:string): Promise<any> {
+    
+    /* const id=profile.profile_id
+    const query = this.postrepository.createQueryBuilder('post');
+    const posts=await this.profilerepository.find({}) */
+   /*  const posts = await  this.postrepository.find() */
+   const query = this.postrepository.createQueryBuilder('post');
+   const posts=await this.profilerepository.find({relations:["posts"],where:{profile_id:uid}})
+   return posts; 
+  } 
 
   async searchpost(topicdto: GetPostByTopic): Promise<any> {
     const query = this.postrepository.createQueryBuilder('post');

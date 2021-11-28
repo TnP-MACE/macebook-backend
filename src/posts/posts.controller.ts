@@ -26,6 +26,13 @@ export class PostsController {
     getallposts():Promise<any>{
         return this.postservice.getallposts();
     }
+    
+    @Get('/profile_posts')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    getallposts_by_profile(@Req() req:RequestWithUser):Promise<any>{
+        return this.postservice.getallposts_by_profile(req.user.uid);
+    }
 
     @Get('/search')
     @ApiBearerAuth()
