@@ -59,14 +59,14 @@ export class PostsController {
         return this.postservice.getsinglepost(post_id)
     }
 
-/*     @UseGuards(AuthGuard('jwt'))
+     @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
     @ApiBearerAuth()
     InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser): Promise <any> {
         return this.postservice.insertpost(postdto,req.user.uid)
     }
- */
-
+ 
+/* 
     @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
     @ApiBearerAuth()
@@ -95,7 +95,7 @@ export class PostsController {
       console.log(postdto)
         return this.postservice.insertpost(postdto,req.user.uid,file.filename)
     }
-
+ */
 
     @Patch('/update_post/:post_id')
     @ApiBearerAuth()

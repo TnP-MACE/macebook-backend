@@ -120,7 +120,7 @@ export class PostsService {
       };
 
     } */
-    async insertpost(data: PostsDto, user_id: string,filename:string): Promise<any> {
+    async insertpost(data: PostsDto,user_id:string): Promise<any> {
       console.log(data)
       try {
         //const post = await this.postRepository.findOne(post_id)
@@ -131,9 +131,9 @@ export class PostsService {
         console.log(profile)
         const { text } = data;
         const profile_image_name=profile.profile_image_url
-        const image_name=filename
+        /* const image_name=filename */
         const post = this.postrepository.create({
-          post_image_name:filename,
+        /*   post_image_name:filename, */
           text,
           likes: [],
           comments: [],
