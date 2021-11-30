@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Any, Connection, In, Repository } from 'typeorm';
 import { Posts } from './entity/post.entity';
@@ -8,6 +8,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostByTopic } from './dto/get-post-by-topic.dto';
 import Profile from 'src/profile/entities/profile.entity';
 import User from 'src/user/entities/user.entity';
+import { profile } from 'console';
 const fs = require('fs')
 
 
@@ -31,16 +32,34 @@ export class PostsService {
     return posts;
   }
 
-    async getallposts_by_profile(uid:string): Promise<any> {
+  async getallposts_by_profile(uid:string,id:any): Promise<any> {
     
     /* const id=profile.profile_id
     const query = this.postrepository.createQueryBuilder('post');
     const posts=await this.profilerepository.find({}) */
    /*  const posts = await  this.postrepository.find() */
-   const query = this.postrepository.createQueryBuilder('post');
-   const posts=await this.profilerepository.find({relations:["posts"],where:{profile_id:uid}})
+   /* const query = this.postrepository.createQueryBuilder('post'); */
+   
+   console.log(id)
+   const profile=await this.profilerepository.find({where:{profile_id:id}});
+  //  console.log(profile)
+   
+   
+   const posts=await this.postrepository.createQueryBuilder("Posts").where("Posts.profileProfileId = :profile_id",{profile_id:id.id}).getMany();
+   console.log(posts)
    return posts; 
-  } 
+  }
+
+  async getsinglepost(post_id: string): Promise<Posts> {
+    console.log(post_id)
+    const post = await this.postrepository.findOne(post_id);
+    console.log(post)
+    if (!post) {
+      throw new NotFoundException();
+    }
+    return post;
+
+  }
 
   async searchpost(topicdto: GetPostByTopic): Promise<any> {
     const query = this.postrepository.createQueryBuilder('post');
@@ -71,14 +90,7 @@ export class PostsService {
   }
 
 
-  async getsinglepost(post_id: string): Promise<Posts> {
-    const post = await this.postrepository.findOne(post_id);
-    if (!post) {
-      throw new NotFoundException();
-    }
-    return post;
 
-  }
 /* 
   async insertpost(data: PostsDto, user_id: string): Promise<any> {
     console.log(data)

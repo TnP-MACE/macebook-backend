@@ -13,6 +13,7 @@ import jwtAuthenticationGuard from 'src/user/guards/jwt-auth.guard'
 import localAuthenticationGuard from 'src/user/guards/local-auth.guard'
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { profile } from 'console';
 
 
 @ApiTags('Posts')
@@ -28,11 +29,23 @@ export class PostsController {
         return this.postservice.getallposts();
     }
     
-    @Get('/profile_posts')
+    @Get('/profile_posts/:id')
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
-    getallposts_by_profile(@Req() req:RequestWithUser):Promise<any>{
-        return this.postservice.getallposts_by_profile(req.user.uid);
+    @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })  
+    getallposts_by_profile(@Req() req:RequestWithUser,@Param() id:string):Promise<any>{
+        return this.postservice.getallposts_by_profile(req.user.uid,id);
+    }
+
+
+    @Get('/:post_id')
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @ApiOperation({ summary: 'Search Post' })
+    @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } }) 
+    
+    SinglePost(@Param() post_id:string):Promise<any>{
+        return this.postservice.getsinglepost(post_id)
     }
 
     @Get('/search')
@@ -48,7 +61,7 @@ export class PostsController {
     getpostbytopic(@Query() topicdto:GetPostByTopic):Promise<any>{
         return this.postservice.getpostbytopic(topicdto)
     }
-
+/* 
     @Get('/:post_id')
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
@@ -58,7 +71,7 @@ export class PostsController {
     SinglePost(@Param() post_id:string):Promise<any>{
         return this.postservice.getsinglepost(post_id)
     }
-
+ */
      @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
     @ApiBearerAuth()
