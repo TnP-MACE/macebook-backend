@@ -10,7 +10,11 @@ export class LoginUserDto {
   @IsEmail()
   email: string;
   
-  @ApiProperty()
+  @ApiProperty({
+    description:'Password',
+    type:'string',
+    example:'AZDq-49.orAZWN'
+  })
   @IsString()
   @MinLength(8)
   @MaxLength(128)
