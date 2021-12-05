@@ -72,12 +72,6 @@ export class ProfileController {
     return this.profileService.deleteprofile(req.user.uid);
   }
 
-
-
-
-
-
-
   // PROFILE AND COVER IMAGES
   @UseGuards(AuthGuard('jwt'))
   @Post('/picture')
@@ -95,17 +89,18 @@ export class ProfileController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('profilepicture', {
-    storage: diskStorage({
-      destination: './uploads/profile',
-      filename: (req, file, cb) => {
-        const fileName = uuidv4();
-        return cb(null, `${fileName}${extname(file.originalname)}`);
-      }
-    })
-  }))
+  // @UseInterceptors(FileInterceptor('profilepicture', {
+  //   storage: diskStorage({
+  //     destination: './uploads/profile',
+  //     filename: (req, file, cb) => {
+  //       const fileName = uuidv4();
+  //       return cb(null, `${fileName}${extname(file.originalname)}`);
+  //     }
+  //   })
+  // }))
+  @UseInterceptors(FileInterceptor('profilepicture'))
   uploadProfileImage(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
-    return this.profileService.uploadprofileimage(req.user.uid, file.filename);
+    return this.profileService.uploadprofileimage(req.user.uid, file.buffer, file.originalname);
   }
 
   
@@ -138,6 +133,7 @@ export class ProfileController {
     console.log(file)
     return this.profileService.uploadcoverimage(req.user.uid, file.filename);
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Patch('/picture')
   @ApiOperation({ summary: 'Update profile image' })
@@ -218,8 +214,6 @@ export class ProfileController {
 
   }
 
-
-
   // CONNECTION CREATION //status= "invite","connected"
 
   @Post('/:id/invite')
@@ -279,8 +273,5 @@ export class ProfileController {
   DeleteExperience(@Param() param: any) {
     return this.profileService.deleteExperience(param.experience_id);
   }
-
-
-
 
 }

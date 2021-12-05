@@ -9,10 +9,12 @@ import Experience from './entities/experience.entity';
 import { Posts } from 'src/posts/entity/post.entity';
 import { Comments } from 'src/comments/entities/comment.entity';
 import User from 'src/user/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+
 
 @Module({
  imports:[ TypeOrmModule.forFeature([ Profile,Connections,Skills,Experience,Posts,Comments,User ])],
   controllers: [ProfileController],
-  providers: [ProfileService]
+  providers: [ProfileService, ConfigService ]
 })
 export class ProfileModule {}

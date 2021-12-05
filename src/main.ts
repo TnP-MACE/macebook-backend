@@ -5,6 +5,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv'; config();
 import * as cookieParser from 'cookie-parser';
 import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
+import { config as configaws } from 'aws-sdk';
 
 async function bootstrap() {
   const logger = new Logger('Macebook Server');
@@ -30,6 +32,13 @@ async function bootstrap() {
     validationError: { target: false },
   }));
 
+  const configService = app.get((ConfigService))
+  configaws.update({
+    accessKeyId : configService.get('AWS_ACCESS_KEY_ID'),
+    secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
+    region: configService.get('AWS_REGION'),
+  })
+  
   const port = process.env.PORT || 4009;
   await app.listen(port);
   logger.log(`Application Listening on Port ${port} `);

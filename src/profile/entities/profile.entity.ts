@@ -47,6 +47,9 @@ export default class Profile {
   @Column({ nullable: true })
   profile_image_url: string;
 
+  @Column({ nullable : true})
+  public profile_image_key: string;
+
   @Column({ nullable: true })
   cover_url: string;
 

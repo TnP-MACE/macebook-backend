@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { getManager, Repository } from "typeorm";
 import Profile from './entities/profile.entity';
@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Connections from './entities/connections.entity';
 import Skills from './entities/skills.entity';
 import Experience from './entities/experience.entity';
+import { S3 } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 const fs = require('fs')
 @Injectable()
@@ -18,7 +20,8 @@ export class ProfileService {
     @InjectRepository(Skills)
     private readonly skillsRepository: Repository<Skills>,
     @InjectRepository(Experience)
-    private readonly experienceRepository: Repository<Experience>
+    private readonly experienceRepository: Repository<Experience>,
+    private readonly configService: ConfigService
   ) { }
   async getProfileDetails(key:string): Promise<any> {
     var sample="";
@@ -199,28 +202,39 @@ export class ProfileService {
   // COVER AND PROFILE IMAGE
 
 
-  async uploadprofileimage(profile_id: string, url: string): Promise<any> {
+  async uploadprofileimage(profile_id: string, imageBuffer: Buffer, url: string): Promise<any> {
 
     try {
+      const s3 = new S3();
+      const uploadResult = await s3.upload({
+      Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+      Body: imageBuffer,
+      Key: `${uuidv4()}-${url}`
+    })
+      .promise();
       
-      var profile = await this.profileRepository.find({profile_id: profile_id})
-      console.log(profile.length==0)
-      if(profile.length!=0){
-        if(profile[0].profile_image_url){
-          try {
-            fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
-            //file removed
-          } catch (err) {
-            console.error(err)
-          }
-        }
-        
+    var profile = await this.profileRepository.findOne({profile_id})
+      
+      // console.log(profile.length==0)
+      // if(profile.length!=0){
+      //   if(profile[0].profile_image_url){
+      //     try {
+      //       fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
+      //       //file removed
+      //     } catch (err) {
+      //       console.error(err)
+      //     }
+      //   }
+      // }
 
+      if (profile){
+        var user = {
+          profile_id: profile_id,
+          profile_image_url: uploadResult.Location,
+          profile_image_key : uploadResult.Key
+        }
       }
-      var user = {
-        profile_id: profile_id,
-        profile_image_url: url
-      }
+
       await this.profileRepository.save(user)
 
       return {
