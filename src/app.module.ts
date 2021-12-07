@@ -41,9 +41,9 @@ import { configValidationSchema } from './config.schema';
     CommentsModule,
     ProfileModule,
     PostsModule,
-    ServeStaticModule.forRoot({
-      rootPath:join(__dirname,'..','uploads'),  
-    })
+    // ServeStaticModule.forRoot({
+    //   rootPath:join(__dirname,'..','uploads'),  
+    // })
   ],
   controllers: [],
   providers: [],
