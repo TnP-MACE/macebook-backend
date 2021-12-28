@@ -155,21 +155,23 @@ export class PostsService {
         post.profile = profile;
         post.post_username=name
         post.post_profile_image_name=profile_image_name
+        post.post_profile_id=user_id
+        
   
         console.log(post)
   
         await this.postrepository.save(post);
         return {
           post,
-          
+          user_id,
           sucess: true,
           message: 'post is uploded',
         };
       } catch (err) {
         console.log(err, 'err');
         return {
-          sucess: true,
-          message: 'post is uploaded'
+          sucess: false,
+          message: 'post is not uploaded'
         };
   
       }
