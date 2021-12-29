@@ -9,12 +9,6 @@ import {
     PrimaryGeneratedColumn
   } from 'typeorm';
 
-  // export enum UserType {
-  //   STUDENT = "student",
-  //   ALUMNUS = "alumnus",
-  //   GHOST = "ghost"
-  // }
-
   @Entity('User')
   @Unique(['email','username'])
   export default class User {

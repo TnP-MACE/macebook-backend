@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Req, Res, U
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { jwtConstants } from '../config/constants';
 import jwtAuthenticationGuard from './guards/jwt-auth.guard'
 import localAuthenticationGuard from './guards/local-auth.guard'
 import { Response } from 'express';
