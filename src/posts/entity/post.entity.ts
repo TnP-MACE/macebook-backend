@@ -40,6 +40,9 @@ export class Posts {
     @Column({nullable:true})
     post_profile_image_name:string
 
+    @Column({nullable:true})
+    post_profile_id:string
+
 
 
     //Post-Comment(AR)
