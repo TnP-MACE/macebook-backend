@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CommentsModule } from './comments/comments.module';
-//import { ConfigDbModule } from './config/dbConfig';
 import { UserModule } from './user/user.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ProfileModule } from './profile/profile.module';
 import { PostsModule } from './posts/posts.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ConfigModule,ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configValidationSchema } from './config.schema';
@@ -17,7 +14,6 @@ import { configValidationSchema } from './config.schema';
       envFilePath: [`.env.stage.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
     }),
-    // ConfigDbModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -41,9 +37,6 @@ import { configValidationSchema } from './config.schema';
     CommentsModule,
     ProfileModule,
     PostsModule,
-    // ServeStaticModule.forRoot({
-    //   rootPath:join(__dirname,'..','uploads'),  
-    // })
   ],
   controllers: [],
   providers: [],
