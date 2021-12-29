@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpServer, Param, Patch, Post, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors, } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpServer, Param, Patch, Post, Req, Res, UploadedFile, UploadedFiles, UseGuards, UseInterceptors, } from '@nestjs/common';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import path, { extname } from 'path';
@@ -73,10 +73,10 @@ export class ProfileController {
   }
 
   // PROFILE AND COVER IMAGES
+
   @UseGuards(AuthGuard('jwt'))
   @Post('/picture')
   @ApiOperation({ summary: 'Upload profile image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -89,25 +89,14 @@ export class ProfileController {
       },
     },
   })
-  // @UseInterceptors(FileInterceptor('profilepicture', {
-  //   storage: diskStorage({
-  //     destination: './uploads/profile',
-  //     filename: (req, file, cb) => {
-  //       const fileName = uuidv4();
-  //       return cb(null, `${fileName}${extname(file.originalname)}`);
-  //     }
-  //   })
-  // }))
   @UseInterceptors(FileInterceptor('profilepicture'))
   uploadProfileImage(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
     return this.profileService.uploadprofileimage(req.user.uid, file.buffer, file.originalname);
   }
-
   
   @UseGuards(AuthGuard('jwt'))
   @Post('/cover')
   @ApiOperation({ summary: 'Upload Cover image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -120,24 +109,13 @@ export class ProfileController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('cover', {
-    storage: diskStorage({
-      destination: './uploads/cover',
-      filename: (req, file, cb) => {
-        const fileName = uuidv4();
-        return cb(null, `${fileName}${extname(file.originalname)}`);
-      }
-    })
-  }))
   uploadProfileCover( @UploadedFile() file: Express.Multer.File,@Req() req: RequestWithUser) {
-    console.log(file)
-    return this.profileService.uploadcoverimage(req.user.uid, file.filename);
+    return this.profileService.uploadcoverimage(req.user.uid, file.buffer, file.originalname);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('/picture')
-  @ApiOperation({ summary: 'Update profile image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+  @ApiOperation({ summary: 'Update profile image - not working yet!' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -150,27 +128,13 @@ export class ProfileController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('profilepicture', {
-    storage: diskStorage({
-      destination: './uploads/profile',
-      filename: (req, file, cb) => {
-        const fileName = uuidv4();
-        return cb(null, `${fileName}${extname(file.originalname)}`);
-      }
-    })
-  }))
-  
   updateImage(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
-    console.log(req)
-    console.log("req")
-    console.log(file.filename)
-    return this.profileService.updateprofileimage(req.user.uid,  file.filename);
+    return this.profileService.updateprofileimage(req.user.uid, file.buffer,file.originalname);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('/cover')
-  @ApiOperation({ summary: 'Update Cover image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+  @ApiOperation({ summary: 'Update Cover image - not working yet!' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -183,35 +147,33 @@ export class ProfileController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('cover', {
-    storage: diskStorage({
-      destination: './uploads/cover',
-      filename: (req, file, cb) => {
-        const fileName = uuidv4();
-        return cb(null, `${fileName}${extname(file.originalname)}`);
-      }
-    })
-  }))
   updateProfileImage( @UploadedFile() file: Express.Multer.File,@Req() req: RequestWithUser) {
     console.log(file)
-    return this.profileService.updatecoverimage(req.user.uid,  file.filename);
+    return this.profileService.updatecoverimage(req.user.uid,file.buffer,file.originalname);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('/picture')
   @ApiOperation({ summary: 'Delete profile image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
   deleteProfileImage(@Req() req: RequestWithUser) {
     return this.profileService.deleteprofileimage(req.user.uid);
-
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Delete('/cover')
   @ApiOperation({ summary: 'Delete Cover image' })
-  // @ApiParam({ name: 'profile_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
   deleteCoverImage(@Req() req: RequestWithUser) {
     return this.profileService.deletecoverimage(req.user.uid);
+  }
 
+  //GET IMAGES
+
+  @Get('/images/:id')
+  @ApiOperation({ summary: 'Get image by id' })
+  @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+  FindImage(@Param() param:any, @Res() res:any) {
+    const readStream = this.profileService.getImage(param.id)
+    readStream.pipe(res)
   }
 
   // CONNECTION CREATION //status= "invite","connected"

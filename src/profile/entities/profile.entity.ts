@@ -41,9 +41,6 @@ export default class Profile {
   @Column("simple-json",{nullable:true})
   address:{ place:string, district: string, state: string,country: string };
 
-  // @Column({nullable: true})
-  // utype: string;              //alumini or student
-
   @Column({ nullable: true })
   profile_image_url: string;
 
@@ -52,6 +49,9 @@ export default class Profile {
 
   @Column({ nullable: true })
   cover_url: string;
+
+  @Column({ nullable: true })
+  cover_key: string;
 
   @Column({ nullable: true })
   ref_fullname: string;
@@ -64,7 +64,6 @@ export default class Profile {
 
   @OneToMany(() => Skills, (skills) => skills.profile)
   skills: Skills[];
-
 
   @Column({ type: 'simple-array',nullable:true })
   accomplishments: string[];
@@ -80,17 +79,17 @@ export default class Profile {
 
   //connection on posts and profile
   @OneToMany(()=>Posts, (post)=>post.profile)
-    posts:Posts[]
+  posts:Posts[]
   
   //connection on post and profile
   @OneToMany(()=>Comments, (comment)=>comment.profile)
   comments:Comments[]
 
   @OneToOne(() => User, user => user.profile) // specify inverse side as a second parameter
-    user: User;
+  user: User;
   
-    @OneToMany(()=>Applications, (applications)=>applications.profile,{nullable:false})
-    applications:Applications[]
+  @OneToMany(()=>Applications, (applications)=>applications.profile,{nullable:false})
+  applications:Applications[]
 
 }
 export class ProfileSwagger extends Profile {}

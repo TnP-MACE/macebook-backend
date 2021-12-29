@@ -195,15 +195,9 @@ export class ProfileService {
     }
   }
 
-
-
-
-
   // COVER AND PROFILE IMAGE
 
-
   async uploadprofileimage(profile_id: string, imageBuffer: Buffer, url: string): Promise<any> {
-
     try {
       const s3 = new S3();
       const uploadResult = await s3.upload({
@@ -212,21 +206,8 @@ export class ProfileService {
       Key: `${uuidv4()}-${url}`
     })
       .promise();
-      
-    var profile = await this.profileRepository.findOne({profile_id})
-      
-      // console.log(profile.length==0)
-      // if(profile.length!=0){
-      //   if(profile[0].profile_image_url){
-      //     try {
-      //       fs.unlinkSync(`./uploads/profile/${profile[0].profile_image_url}`)
-      //       //file removed
-      //     } catch (err) {
-      //       console.error(err)
-      //     }
-      //   }
-      // }
 
+    var profile = await this.profileRepository.findOne({profile_id})
       if (profile){
         var user = {
           profile_id: profile_id,
@@ -244,7 +225,6 @@ export class ProfileService {
 
 
     } catch (err) {
-      console.log('err', err);
       return {
         success: false,
         message: 'profile picture not uploaded',
@@ -252,31 +232,32 @@ export class ProfileService {
     }
   }
 
-  async uploadcoverimage(profile_id: string, url: string): Promise<any> {
-
+  async uploadcoverimage(profile_id: string, imageBuffer: Buffer, url: string): Promise<any> {
     try {
-      var profile = await this.profileRepository.find({profile_id: profile_id})
-      if(profile.length!=0){
-        if(profile[0].cover_url){
-          try {
-            fs.unlinkSync(`./uploads/cover/${profile[0].cover_url}`)
-            //file removed
-          } catch (err) {
-            console.error(err)
-          }
-        }
-      }
+      const s3 = new S3();
+      const uploadResult = await s3.upload({
+      Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+      Body: imageBuffer,
+      Key: `${uuidv4()}-${url}`
+      })
+      .promise();
+  
+      var profile = await this.profileRepository.findOne({profile_id})
+      
+      if (profile){
       var user = {
         profile_id: profile_id,
-        cover_url: url
+        cover_url: uploadResult.Location,
+        cover_key : uploadResult.Key
       }
+      }
+      
       await this.profileRepository.save(user)
 
       return {
-        success: true,
-        message: 'profile cover is uploaded'
+      success: true,
+      message: 'profile cover is uploaded'
       }
-
 
     } catch (err) {
       console.log('err', err);
@@ -286,108 +267,67 @@ export class ProfileService {
       };
     }
   }
-  async updateprofileimage(profile_id: string, filenameget: string): Promise<any> {
 
-    try {
-      var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
-      console.log(profiledata);
-      var profile_image_url = profiledata.profile_image_url
-      var url_split = profile_image_url.split("/")
-      var filename = url_split[url_split.length - 1]
-      //  console.log(`.../uploads/profile/${filename}`)
+  async updateprofileimage(profile_id: string, imageBuffer: Buffer, url: string): Promise<any> {
       try {
-        fs.unlinkSync(`./uploads/profile/${filename}`)
-        //file removed
-      } catch (err) {
-        console.error(err)
-      }
-      var user = {
-        profile_id: profile_id,
-        profile_image_url: filenameget
-      }
-      var pro= await this.profileRepository.save(user)
+        var profile = await this.profileRepository.findOne({profile_id})
+        const s3 = new S3();
+        await s3.deleteObject({
+          Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+          Key: profile.profile_image_key,
+        }).promise();
+        const uploadResult = await s3.upload({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Body: imageBuffer,
+        Key: `${uuidv4()}-${url}`
+        })
+        .promise();
+
+          var user = {
+            profile_id: profile_id,
+            profile_image_url: uploadResult.Location,
+            profile_image_key : uploadResult.Key
+          }
+      
+       await this.profileRepository.save(user)
 
       return {
         success: true,
         message: 'profile image is updated'
       }
 
-
     } catch (err) {
-      console.log('err', err);
       return {
         success: false,
         message: 'profile not inserted',
       };
     }
   }
-  // async updateprofileimage(profile_id: string, url: string): Promise<any> {
 
-  //   try {
-  //     var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
-  //     console.log("profiledata");
-  //     // console.log(profiledata);
-  //     // var profile_image_url = profiledata.profile_image_url
-  //     // var url_split = profile_image_url.split("/")
-  //     var profile_image_url = profiledata.cover_url
-  //     var url_split = profile_image_url.split("/")
-  //     var filename = url_split[url_split.length - 1]
-  //     //  console.log(`.../uploads/profile/${filename}`)
-  //     try {
-  //       fs.unlinkSync(`./uploads/profile/${filename}`)
-  //       //file removed
-  //     } catch (err) {
-  //       console.error(err)
-  //     }
-  //     var user = {
-  //       profile_id: profile_id,
-  //       profile_image_url: url
-  //     }
-  //     await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: url }).where("profile_id = :profile_id", { profile_id: profile_id }).execute()
-  //     console.log(user)
-
-  //     return {
-  //       success: true,
-  //       message: 'profile cover is updated'
-  //     }
-
-
-  //   } catch (err) {
-  //     console.log('err', err);
-  //     return {
-  //       success: false,
-  //       message: 'cover not inserted',
-  //     };
-  //   }
-  // }
-  async updatecoverimage(profile_id: any, filenameget: string): Promise<any> {
-
+  async updatecoverimage(profile_id: any, imageBuffer: Buffer, url: string): Promise<any> {
     try {
-      var profiledata = await this.profileRepository.findOne({where:{profile_id:profile_id}});
-
-      console.log(profiledata);
-      var cover_url = profiledata.cover_url
-      var url_split = cover_url.split("/")
-      var filename = url_split[url_split.length - 1]
-      //  console.log(`.../uploads/profile/${filename}`)
-      try {
-        fs.unlinkSync(`./uploads/cover/${filename}`)
-
-      } catch (err) {
-        console.error(err)
-      }
+      var profiledata = await this.profileRepository.findOne({profile_id})
+      const s3 = new S3();
+      await s3.deleteObject({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: profiledata.cover_key,
+      }).promise();
+      const uploadResult = await s3.upload({
+      Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+      Body: imageBuffer,
+      Key: `${uuidv4()}-${url}`
+      })
+      .promise();
       var user = {
         profile_id: profile_id,
-        cover_url: filenameget
+        cover_url: uploadResult.Location,
+        cover_key : uploadResult.Key
       }
       await this.profileRepository.save(user)
-
       return {
         success: true,
         message: 'profile cover is updated'
       }
-
-
     } catch (err) {
       console.log('err', err);
       return {
@@ -396,57 +336,42 @@ export class ProfileService {
       };
     }
   }
+
   async deleteprofileimage(profile: any): Promise<any> {
     try {
       var profiledata = await this.profileRepository.findOne(profile);
-      console.log(profiledata);
-      var profile_image_url = profiledata.profile_image_url
-      var url_split = profile_image_url.split("/")
-      var filename = url_split[url_split.length - 1]
-      //  console.log(`.../uploads/profile/${filename}`)
-      try {
-        fs.unlinkSync(`./uploads/profile/${filename}`)
-        //file removed
-      } catch (err) {
-        console.error(err)
-      }
-      var profiledatas = await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profiledata.profile_id }).execute()
-console.log(profiledatas)
+      const s3 = new S3();
+      await s3.deleteObject({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: profiledata.profile_image_key,
+      }).promise();
+      await this.profileRepository.createQueryBuilder().update(Profile).set({ profile_image_url: null, profile_image_key:null }).where("profile_id = :profile_id", { profile_id: profiledata.profile_id }).execute()
       return {
         success: true,
         message: 'Successfully deleted profile image',
       };
     } catch (err) {
-      console.log('err', err);
       return {
         success: false,
         message: 'profile picture not delete',
       };
     }
   }
-  async deletecoverimage(profile: any): Promise<any> {
 
+  async deletecoverimage(profile: any): Promise<any> {
     try {
       var profiledata = await this.profileRepository.findOne(profile);
-      console.log(profiledata);
-      var cover_url = profiledata.cover_url
-      var url_split = cover_url.split("/")
-      var filename = url_split[url_split.length - 1]
-      //  console.log(`.../uploads/profile/${filename}`)
-      try {
-        fs.unlinkSync(`./uploads/cover/${filename}`)
-        //file removed
-      } catch (err) {
-        console.error(err)
-      }
-      await this.profileRepository.createQueryBuilder().update(Profile).set({ cover_url: null }).where("profile_id = :id", { id: profile.profile_id }).execute()
-
+      const s3 = new S3();
+      await s3.deleteObject({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: profiledata.cover_key,
+      }).promise();
+      await this.profileRepository.createQueryBuilder().update(Profile).set({ cover_url: null, cover_key:null }).where("profile_id = :id", { id: profile.profile_id }).execute()
       return {
         success: true,
         message: 'Successfully delete profile cover',
       };
     } catch (err) {
-      console.log('err', err);
       return {
         success: false,
         message: 'cover not deleted',
@@ -454,8 +379,10 @@ console.log(profiledatas)
     }
   }
 
-
-
+  getImage(fileKey : string){
+    const s3 = new S3();
+    return s3.getObject({Key: fileKey, Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME') }).createReadStream()
+  }
 
 
   // CONNECTIONS
