@@ -23,8 +23,6 @@ export class Posts {
     @CreateDateColumn()
     createdDate:Date;
 
-
-
     @Column({ length:512 })
     text:string;
 
@@ -42,8 +40,6 @@ export class Posts {
 
     @Column({nullable:true})
     post_profile_id:string
-
-
 
     //Post-Comment(AR)
     @OneToMany(() => Comments, (comments) => comments.post)

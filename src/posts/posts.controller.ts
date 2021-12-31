@@ -7,13 +7,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
 import path, { extname } from 'path';
 import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { get } from 'http';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
-import jwtAuthenticationGuard from 'src/user/guards/jwt-auth.guard'
-import localAuthenticationGuard from 'src/user/guards/local-auth.guard'
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { profile } from 'console';
+
 
 
 @ApiTags('Posts')
@@ -61,17 +58,7 @@ export class PostsController {
     getpostbytopic(@Query() topicdto:GetPostByTopic):Promise<any>{
         return this.postservice.getpostbytopic(topicdto)
     }
-/* 
-    @Get('/:post_id')
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard('jwt'))
-    @ApiOperation({ summary: 'Search Post' })
-    @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } }) 
-    
-    SinglePost(@Param() post_id:string):Promise<any>{
-        return this.postservice.getsinglepost(post_id)
-    }
- */
+
      @UseGuards(AuthGuard('jwt'))
     @Post('/add_post')
     @ApiBearerAuth()
@@ -79,36 +66,7 @@ export class PostsController {
         return this.postservice.insertpost(postdto,req.user.uid)
     }
  
-/* 
-    @UseGuards(AuthGuard('jwt'))
-    @Post('/add_post')
-    @ApiBearerAuth()
-    @ApiConsumes('multipart/form-data')
-      @ApiBody({
-        schema: {
-          type: 'object',
-          properties: {
-            postimage: {
-              type: 'string',
-              format: 'binary',
-            },
-          },
-        },
-      })
-    @UseInterceptors(FileInterceptor('postimage', {
-      storage: diskStorage({
-          destination: './uploads/post',
-          filename: (req, file, cb) => {
-              const fileName = uuidv4();
-              return cb(null, `${fileName}${extname(file.originalname)}`);
-          }
-      })
-  }))
-    InsertPost(@Body() postdto:PostsDto,@Req() req:RequestWithUser, @UploadedFile() file: Express.Multer.File): Promise <any> {
-      console.log(postdto)
-        return this.postservice.insertpost(postdto,req.user.uid,file.filename)
-    }
- */
+
 
     @Patch('/update_post/:post_id')
     @ApiBearerAuth()

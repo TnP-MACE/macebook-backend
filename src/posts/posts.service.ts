@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Any, Connection, In, Repository } from 'typeorm';
 import { Posts } from './entity/post.entity';
-import { v4 as uuidv4 } from 'uuid'
 import { PostsDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostByTopic } from './dto/get-post-by-topic.dto';
@@ -34,15 +33,11 @@ export class PostsService {
 
   async getallposts_by_profile(uid:string,id:any): Promise<any> {
     
-    /* const id=profile.profile_id
-    const query = this.postrepository.createQueryBuilder('post');
-    const posts=await this.profilerepository.find({}) */
-   /*  const posts = await  this.postrepository.find() */
-   /* const query = this.postrepository.createQueryBuilder('post'); */
+
    
    console.log(id)
    const profile=await this.profilerepository.find({where:{profile_id:id}});
-  //  console.log(profile)
+  
    
    
    const posts=await this.postrepository.createQueryBuilder("Posts").where("Posts.profileProfileId = :profile_id",{profile_id:id.id}).getMany();
@@ -91,51 +86,11 @@ export class PostsService {
 
 
 
-/* 
-  async insertpost(data: PostsDto, user_id: string): Promise<any> {
-    console.log(data)
-    try {
-      //const post = await this.postRepository.findOne(post_id)
-      const user = await this.userrepository.findOne({ where: { uid: user_id } })
-      const name=user.username
-      console.log(user)
-      const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
-      console.log(profile)
-      const { text } = data;
-      const profile_image_name=profile.profile_image_url
-      const post = this.postrepository.create({
-        
-        text,
-        likes: [],
-        comments: [],
 
-
-      })
-      post.profile = profile;
-      post.post_username=name
-      post.post_profile_image_name=profile_image_name
-
-      console.log(post)
-
-      await this.postrepository.save(post);
-      return {
-        post,
-        
-        sucess: true,
-        message: 'post is uploded',
-      };
-    } catch (err) {
-      console.log(err, 'err');
-      return {
-        sucess: true,
-        message: 'post is uploaded'
-      };
-
-    } */
     async insertpost(data: PostsDto,user_id:string): Promise<any> {
       console.log(data)
       try {
-        //const post = await this.postRepository.findOne(post_id)
+      
         const user = await this.userrepository.findOne({ where: { uid: user_id } })
         const name=user.username
         console.log(user)
@@ -143,23 +98,16 @@ export class PostsService {
         console.log(profile)
         const { text } = data;
         const profile_image_name=profile.profile_image_url
-        /* const image_name=filename */
         const post = this.postrepository.create({
-        /*   post_image_name:filename, */
           text,
           likes: [],
           comments: [],
-  
   
         })
         post.profile = profile;
         post.post_username=name
         post.post_profile_image_name=profile_image_name
         post.post_profile_id=user_id
-        
-  
-        console.log(post)
-  
         await this.postrepository.save(post);
         return {
           post,
@@ -285,9 +233,7 @@ export class PostsService {
       var postdata = await this.postrepository.findOne(post_id);
       console.log(post_id);
       var filename = postdata.post_image_name
-      /* var url_split = profile_image_url.split("/")
-      var filename = url_split[url_split.length - 1] */
-      //  console.log(`.../uploads/profile/${filename}`)
+  
       try {
         fs.unlinkSync(`./uploads/post/${filename}`)
         //file removed
@@ -326,16 +272,7 @@ export class PostsService {
       var postdata = await this.postrepository.findOne(post_id);
       console.log(postdata);
       var filename = postdata.post_image_name
-      /* var url_split = profile_image_url.split("/")
-      var filename = url_split[url_split.length - 1] */
-      //  console.log(`.../uploads/profile/${filename}`)
-      try {
-        fs.unlinkSync(`./uploads/post/${filename}`)
-        //file removed
-      } catch (err) {
-        console.error(err)
-      }
-      /* var profiledatas = await this.postrepository.createQueryBuilder().update(Profile).set({ profile_image_url: null }).where("profile_id = :profile_id", { profile_id: profile.profile_id }).execute() */
+      
       var user = {
         post_id: postdata.post_id,
         post_image_url: null
