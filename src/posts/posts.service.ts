@@ -31,18 +31,18 @@ export class PostsService {
     return posts;
   }
 
-  async getallposts_by_profile(uid:string,id:any): Promise<any> {
-    
+  async getallposts_by_profile(uid: string, id: any): Promise<any> {
 
-   
-   console.log(id)
-   const profile=await this.profilerepository.find({where:{profile_id:id}});
-  
-   
-   
-   const posts=await this.postrepository.createQueryBuilder("Posts").where("Posts.profileProfileId = :profile_id",{profile_id:id.id}).getMany();
-   console.log(posts)
-   return posts; 
+
+
+    console.log(id)
+    const profile = await this.profilerepository.find({ where: { profile_id: id } });
+
+
+
+    const posts = await this.postrepository.createQueryBuilder("Posts").where("Posts.profileProfileId = :profile_id", { profile_id: id.id }).getMany();
+    console.log(posts)
+    return posts;
   }
 
   async getsinglepost(post_id: string): Promise<Posts> {
@@ -87,57 +87,50 @@ export class PostsService {
 
 
 
-    async insertpost(data: PostsDto,user_id:string): Promise<any> {
-      console.log(data)
-      try {
-      
-        const user = await this.userrepository.findOne({ where: { uid: user_id } })
-        const name=user.username
-        console.log(user)
-        const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
-        console.log(profile)
-        const { text } = data;
-        const profile_image_name=profile.profile_image_url
-        const post = this.postrepository.create({
-          text,
-          likes: [],
-          comments: [],
-  
-        })
-        post.profile = profile;
-        post.post_username=name
-        post.post_profile_image_name=profile_image_name
-        post.post_profile_id=user_id
-        await this.postrepository.save(post);
-        return {
-          post,
-          user_id,
-          sucess: true,
-          message: 'post is uploded',
-        };
-      } catch (err) {
-        console.log(err, 'err');
-        return {
-          sucess: false,
-          message: 'post is not uploaded'
-        };
-  
-      }
-  
-  
+  async insertpost(data: PostsDto, user_id: string): Promise<any> {
+    console.log(data)
+    try {
 
+      const user = await this.userrepository.findOne({ where: { uid: user_id } })
+      const name = user.username
+      console.log(user)
+      const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
+      console.log(profile)
+      const { text } = data;
+      const profile_image_name = profile.profile_image_url
+      const post = this.postrepository.create({
+        text,
+        likes: [],
+        comments: [],
 
+      })
+      post.profile = profile;
+      post.post_username = name
+      post.post_profile_image_name = profile_image_name
+      post.post_profile_id = user_id
+      await this.postrepository.save(post);
+      return {
+        post,
+        user_id,
+        sucess: true,
+        message: 'post is uploded',
+      };
+    } catch (err) {
+      console.log(err, 'err');
+      return {
+        sucess: false,
+        message: 'post is not uploaded'
+      };
 
-
-
+    }
   }
 
   async updatepost(post_id: string, updatepostdto: UpdatePostDto): Promise<any> {
     console.log(updatepostdto);
     try {
-      const {  text } = updatepostdto;
+      const { text } = updatepostdto;
       const post = await this.getsinglepost(post_id);
-      
+
       post.text = text;
       await this.postrepository.save(post);
 
@@ -202,13 +195,13 @@ export class PostsService {
 
   }
 
-  async uploadpostphoto(post: any, image_name: string,user_id:string): Promise<any> {
+  async uploadpostphoto(post: any, image_name: string, user_id: string): Promise<any> {
     try {
-      const profile=await this.profilerepository.findOne({where:{profile_id:user_id}});
+      const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } });
       var user = {
         post_id: post.post_id,
         post_image_name: image_name,
-        profile:profile
+        profile: profile
       }
       await this.postrepository.save(user)
       return {
@@ -233,7 +226,7 @@ export class PostsService {
       var postdata = await this.postrepository.findOne(post_id);
       console.log(post_id);
       var filename = postdata.post_image_name
-  
+
       try {
         fs.unlinkSync(`./uploads/post/${filename}`)
         //file removed
@@ -272,7 +265,7 @@ export class PostsService {
       var postdata = await this.postrepository.findOne(post_id);
       console.log(postdata);
       var filename = postdata.post_image_name
-      
+
       var user = {
         post_id: postdata.post_id,
         post_image_url: null
