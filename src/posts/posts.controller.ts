@@ -11,8 +11,6 @@ import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-
-
 @ApiTags('Posts')
 @Controller('api/v1/posts')
 export class PostsController {
@@ -65,8 +63,6 @@ export class PostsController {
   InsertPost(@Body() postdto: PostsDto, @Req() req: RequestWithUser): Promise<any> {
     return this.postservice.insertpost(postdto, req.user.uid)
   }
-
-
 
   @Patch('/update_post/:post_id')
   @ApiBearerAuth()

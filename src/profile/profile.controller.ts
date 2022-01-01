@@ -1,13 +1,8 @@
-import { Body, Controller, Delete, Get, HttpServer, Param, Patch, Post, Req, Res, UploadedFile, UploadedFiles, UseGuards, UseInterceptors, } from '@nestjs/common';
-import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import path, { extname } from 'path';
-import { ProfileDto, ProfileParameter } from './dto/create-profile.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ProfileDto} from './dto/create-profile.dto';
 import { ProfileService } from './profile.service'
-import { v4 as uuidv4 } from 'uuid';
-import { request } from 'http';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ProfileSwagger } from './entities/profile.entity';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ConnectionDto } from './dto/connection.dto';
 import { ExperienceDto } from './dto/experience.dto';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
@@ -22,16 +17,17 @@ export class ProfileController {
   @Get('/all/:key')
   @ApiOperation({ summary: 'Get All Profile by name' })
   @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
-
   Findprofile(@Param() param: any): Promise<any> {
     return this.profileService.getProfileDetails(param.key)
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('/mystatus')
   @ApiOperation({ summary: 'Get status about logged in user(Only works after login)-Like complete or not' })
   GetMyProfileStatus(@Req() req: RequestWithUser): Promise<any> {
     return this.profileService.returnStatus( req.user.uid);
   }
+
   @Get('/search/:key')
   @ApiOperation({ summary: 'Search Profile -don"t use' })
   @ApiParam({ name: 'key', required: true, schema: { oneOf: [{ type: 'string' }] } })
@@ -43,15 +39,16 @@ export class ProfileController {
   @ApiOperation({ summary: 'Get Profile by id' })
   @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
   FindOneProfile(@Param() param:any,@Body() body:any): Promise<any> {
-
     return this.profileService.getOneprofileDetail(param.id,body.id)
   }
+
   //     @Get('/p2/:profile_id')
   //     @ApiOperation({ summary: 'Get Profile by id' })
   //   @ApiParam({name: 'profile_id', required: true, schema: { oneOf: [{type: 'string'}]}})
   //     FindProfileWithConnectionStatus(@Param() profile_id: string): Promise<any> {
   //         return this.profileService.getOneprofileDetailwithConnection(profile_id)
   //     }
+
   @UseGuards(AuthGuard('jwt'))
   @Post('/completion')
   @ApiOperation({ summary: 'Complete Profile' })
@@ -59,12 +56,14 @@ export class ProfileController {
   AddProfile(@Body() profileDto: ProfileDto, @Req() req: RequestWithUser) {
     return this.profileService.insertprofile(profileDto, req.user.uid);
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Patch('/updation')
   @ApiOperation({ summary: 'Update Profile' })
   PutProfile(@Body() profileDto: ProfileDto, @Req() req: RequestWithUser) {
     return this.profileService.updateprofile(profileDto,req.user.uid);
   }
+
   @UseGuards(AuthGuard('jwt'))
   @Delete('')
   @ApiOperation({ summary: 'Delete Profile details> Will not be used' })
@@ -207,7 +206,6 @@ export class ProfileController {
     console.log(body)
     return this.profileService.connectiondisconnect(id, body.profile_id);
   }
-
 
   // Experience
   @UseGuards(AuthGuard('jwt'))

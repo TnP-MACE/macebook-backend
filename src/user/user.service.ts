@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository, DeleteResult } from 'typeorm';
 import User from './entities/user.entity';
-import { jwtConstants } from '../config/constants';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -76,7 +75,7 @@ export class UserService {
     throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
   }
 
-   //Login 
+  //Login 
   public login(user1: any){ 
       delete user1.password
       const payload = { email: user1.email };
@@ -85,22 +84,47 @@ export class UserService {
       // return `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConstants.expiresin}`;  
   }
 
-  //logout
-  public getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+  //Edit username
+  public async editUsername(uid: string, username: string){
+    await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({username : username})
+      .where('uid = :uid',{ uid})
+      .execute()
+      return { success:true}
   }
 
-  //delete account 
+  // Change password
+  public async changePassword (email : string, data : ChangePasswordDto){
+    try{
+    const user = await this.validateUser(email,data.currentPassword)
+    if (user){
+      await this.userRepository
+          .createQueryBuilder()
+          .update(User)
+          .set({password : await bcrypt.hash(data.password, 10)})
+          .where('email = :email',{email})
+          .execute();
+      return { success:true}
+    }
+    }catch (err){
+      throw err;
+    }
+  }
+
+  //Delete account 
   public async deleteUser(uid : string, password: string) :  Promise<any>  {
     try{
       const userToDelete = await this.userRepository.findOne({where:{uid}})
       if (await bcrypt.compare(password,userToDelete.password)){
-        return await this.userRepository
+        await this.userRepository
           .createQueryBuilder()
           .delete()
           .from(User)
           .where('uid = :uid',{ uid})
           .execute();
+        return { success:true}
       }
       throw new HttpException('Password incorrect', HttpStatus.UNAUTHORIZED);
     } catch (err){
@@ -108,29 +132,9 @@ export class UserService {
     }
   }
 
-  //edit username
-  public async editUsername(uid: string, username: string){
-    return await this.userRepository
-      .createQueryBuilder()
-      .update(User)
-      .set({username : username})
-      .where('uid = :uid',{ uid})
-      .execute()
-  }
+  // Logout
+  // public getCookieForLogOut() {
+  //   return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+  // }
 
-  public async changePassword (email : string, data : ChangePasswordDto){
-    try{
-    const user = await this.validateUser(email,data.currentPassword)
-    if (user){
-      return await this.userRepository
-          .createQueryBuilder()
-          .update(User)
-          .set({password : await bcrypt.hash(data.password, 10)})
-          .where('email = :email',{email})
-          .execute();
-    }
-    }catch (err){
-      throw err;
-    }
-  }
 }
