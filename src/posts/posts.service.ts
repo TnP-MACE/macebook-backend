@@ -129,6 +129,7 @@ export class PostsService {
   async deletepost(post_id: string): Promise<any> {
     try {
       const result = await this.postrepository.delete(post_id);
+    
       if (result.affected === 0) {
         throw new NotFoundException(`Task with ID "${post_id}" not found`);
       }

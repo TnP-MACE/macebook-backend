@@ -6,10 +6,11 @@ import {Posts} from './entity/post.entity'
 import User from 'src/user/entities/user.entity';
 import { Comments } from 'src/comments/entities/comment.entity';
 import Profile from 'src/profile/entities/profile.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports:[ TypeOrmModule.forFeature([ Posts,User,Comments,Profile])],
-  providers: [PostsService],
+  providers: [PostsService, ConfigService ],
   controllers: [PostsController]
 })
 export class PostsModule {}
