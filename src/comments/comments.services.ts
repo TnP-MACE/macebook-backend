@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Posts } from "src/posts/entity/post.entity";
 import User from "src/user/entities/user.entity";
 import Profile from "src/profile/entities/profile.entity";
-import { profile } from "console";
 
 @Injectable()
 export class CommentsService {
