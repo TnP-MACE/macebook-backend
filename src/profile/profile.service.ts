@@ -206,7 +206,6 @@ export class ProfileService {
       Key: `${uuidv4()}-${url}`
     })
       .promise();
-
     var profile = await this.profileRepository.findOne({profile_id})
       if (profile){
         var user = {
@@ -215,15 +214,11 @@ export class ProfileService {
           profile_image_key : uploadResult.Key
         }
       }
-
       await this.profileRepository.save(user)
-
       return {
         success: true,
         message: 'profile picture is  uploaded'
       }
-
-
     } catch (err) {
       return {
         success: false,
@@ -241,9 +236,7 @@ export class ProfileService {
       Key: `${uuidv4()}-${url}`
       })
       .promise();
-  
       var profile = await this.profileRepository.findOne({profile_id})
-      
       if (profile){
       var user = {
         profile_id: profile_id,
@@ -251,14 +244,11 @@ export class ProfileService {
         cover_key : uploadResult.Key
       }
       }
-      
       await this.profileRepository.save(user)
-
       return {
       success: true,
       message: 'profile cover is uploaded'
       }
-
     } catch (err) {
       console.log('err', err);
       return {
