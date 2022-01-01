@@ -79,7 +79,7 @@ export class PostsService {
       const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } })
       console.log(profile)
       const { text } = data;
-      const profile_image_name = profile.profile_image_url
+      const profile_image_name = profile.profile_image_key
       const post = this.postrepository.create({
         text,
         likes: [],
