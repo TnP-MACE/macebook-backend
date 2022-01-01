@@ -160,9 +160,8 @@ export class CommentsService {
 
       return {
         comment: comments,
-        user_name,
-        profile_name,
-        profiile_image_name
+        
+        
       };
     } catch (err) {
       console.log('err', err);
