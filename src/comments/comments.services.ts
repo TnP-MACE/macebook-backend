@@ -36,10 +36,14 @@ export class CommentsService {
         comment.profile = profile;
         comment.post = post;
         comment.body = data.body;
+        comment.comment_profile_name=profile.fullname
+        comment.comment_profile_image_name=profile.profile_image_url
         console.log(comment)
         await this.commentRepository.save(comment);
 
         return {
+
+          comment,
           success: true,
           message: 'Comment added'
         };
@@ -92,17 +96,13 @@ export class CommentsService {
     try {
       const post = await this.postRepository.findOne(post_id)
       const profile_id = post.post_profile_id
-      const profile = await this.profileRepository.findOne(profile_id)
-      const post_body = post.text
-      const post_image_name = post.post_image_name
-      const profile_name = profile.fullname
-      const profile_image_name = profile.profile_image_url
+      
+      
       var comments = await this.commentRepository.find({ where: { post } })
       return {
         post,
         comments,
-        profile_name,
-        profile_image_name
+       
 
       };
     } catch (err) {

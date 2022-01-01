@@ -13,6 +13,12 @@ export class Comments {
   @Column()
   body: string;
 
+  @Column({nullable:true})
+  comment_profile_name:string
+
+  @Column({nullable:true})
+  comment_profile_image_name:string
+
 
   @ManyToOne(() => Posts, (post) => post.comments,{nullable:false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @JoinColumn()

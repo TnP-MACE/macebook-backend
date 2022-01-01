@@ -19,7 +19,8 @@ export class PostsService {
     @InjectRepository(Profile)
     private readonly profilerepository: Repository<Profile>,
     @InjectRepository(User)
-    private readonly userrepository: Repository<User>
+    private readonly userrepository: Repository<User>,
+    
 
 
   ) { }
@@ -37,9 +38,6 @@ export class PostsService {
 
     console.log(id)
     const profile = await this.profilerepository.find({ where: { profile_id: id } });
-
-
-
     const posts = await this.postrepository.createQueryBuilder("Posts").where("Posts.profileProfileId = :profile_id", { profile_id: id.id }).getMany();
     console.log(posts)
     return posts;
@@ -152,8 +150,9 @@ export class PostsService {
 
   async deletepost(post_id: string): Promise<any> {
     try {
-
+      const post= await this.postrepository.findOne(post_id);
       const result = await this.postrepository.delete(post_id);
+    
       if (result.affected === 0) {
         throw new NotFoundException(`Task with ID "${post_id}" not found`);
       }
