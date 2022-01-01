@@ -8,6 +8,9 @@ import { GetPostByTopic } from './dto/get-post-by-topic.dto';
 import Profile from 'src/profile/entities/profile.entity';
 import User from 'src/user/entities/user.entity';
 const fs = require('fs')
+import { S3 } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PostsService {
@@ -17,7 +20,8 @@ export class PostsService {
     @InjectRepository(Profile)
     private readonly profilerepository: Repository<Profile>,
     @InjectRepository(User)
-    private readonly userrepository: Repository<User>
+    private readonly userrepository: Repository<User>,
+    private readonly configService: ConfigService
   ) { }
 
   async getallposts(): Promise<any> {
@@ -27,7 +31,6 @@ export class PostsService {
   }
 
   async getallposts_by_profile(uid: string, id: any): Promise<any> {
-
     console.log(id)
     const profile = await this.profilerepository.find({ where: { profile_id: id } });
     const posts = await this.postrepository.createQueryBuilder("Posts").where("Posts.profileProfileId = :profile_id", { profile_id: id.id }).getMany();
@@ -70,7 +73,6 @@ export class PostsService {
   async insertpost(data: PostsDto, user_id: string): Promise<any> {
     console.log(data)
     try {
-
       const user = await this.userrepository.findOne({ where: { uid: user_id } })
       const name = user.username
       console.log(user)
@@ -159,12 +161,20 @@ export class PostsService {
     }
   }
 
-  async uploadpostphoto(post: any, image_name: string, user_id: string): Promise<any> {
+  async uploadpostphoto(user_id: string, post: any, imageBuffer: Buffer, url: string): Promise<any> {  
     try {
+      const s3 = new S3();
+      const uploadResult = await s3.upload({
+      Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+      Body: imageBuffer,
+      Key: `${uuidv4()}-${url}`
+    })
+      .promise();
       const profile = await this.profilerepository.findOne({ where: { profile_id: user_id } });
       var user = {
         post_id: post.post_id,
-        post_image_name: image_name,
+        post_image_url: uploadResult.Location,
+        post_image_key : uploadResult.Key,
         profile: profile
       }
       await this.postrepository.save(user)
@@ -173,7 +183,6 @@ export class PostsService {
         message: 'post picture is  updated'
       }
     } catch (err) {
-      console.log('err', err);
       return {
         success: false,
         message: 'Post image not inserted',
@@ -184,12 +193,15 @@ export class PostsService {
   async deletepostimage(post_id: any): Promise<any> {
     try {
       var postdata = await this.postrepository.findOne(post_id);
-      console.log(postdata);
-      var filename = postdata.post_image_name
+      const s3 = new S3();
+      await s3.deleteObject({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME'),
+        Key: postdata.post_image_key,
+      }).promise();
       var user = {
         post_id: postdata.post_id,
-        post_image_url: null
-
+        post_image_url: null,
+        post_image_key: null
       }
       this.postrepository.save(user);
       return {
@@ -200,44 +212,49 @@ export class PostsService {
       console.log('err', err);
       return {
         success: false,
-        message: 'post picture not delete',
+        message: 'post picture not deleted',
       };
     }
+  }
+
+  getImage(fileKey : string){
+    const s3 = new S3();
+    return s3.getObject({Key: fileKey, Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME') }).createReadStream()
   }
   
-  async updatepostimage(post_id: any, image_name: string): Promise<any> {
+  // async updatepostimage(post_id: any, image_name: string): Promise<any> {
 
-    try {
-      var postdata = await this.postrepository.findOne(post_id);
-      console.log(post_id);
-      var filename = postdata.post_image_name
+  //   try {
+  //     var postdata = await this.postrepository.findOne(post_id);
+  //     console.log(post_id);
+  //     var filename = postdata.post_image_name
 
-      try {
-        fs.unlinkSync(`./uploads/post/${filename}`)
-        //file removed
-      } catch (err) {
-        console.error(err)
-      }
-      var user = {
-        post_id: postdata.post_id,
-        post_image_name: image_name
-      }
+  //     try {
+  //       fs.unlinkSync(`./uploads/post/${filename}`)
+  //       //file removed
+  //     } catch (err) {
+  //       console.error(err)
+  //     }
+  //     var user = {
+  //       post_id: postdata.post_id,
+  //       post_image_name: image_name
+  //     }
 
-      await this.postrepository.save(user)
+  //     await this.postrepository.save(user)
 
-      return {
-        success: true,
-        message: 'post image is updated'
-      }
+  //     return {
+  //       success: true,
+  //       message: 'post image is updated'
+  //     }
 
-    } catch (err) {
-      console.log('err', err);
-      return {
-        success: false,
-        message: 'post image is not inserted',
-      };
-    }
+  //   } catch (err) {
+  //     console.log('err', err);
+  //     return {
+  //       success: false,
+  //       message: 'post image is not inserted',
+  //     };
+  //   }
 
-  }
+  // }
 
 }

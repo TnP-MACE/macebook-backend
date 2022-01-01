@@ -1,15 +1,12 @@
-import { Body, Controller, Get, Param, Post, Patch, Delete, Req, UploadedFile, Query, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Patch, Delete, Req, UploadedFile, Query, UseInterceptors, UseGuards, Res } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsDto } from './dto/create-post.dto'
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostByTopic } from './dto/get-post-by-topic.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { diskStorage } from 'multer';
-import path, { extname } from 'path';
-import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {FileInterceptor} from '@nestjs/platform-express';
 import RequestWithUser from 'src/user/interfaces/requestWithUser.interface';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Posts')
 @ApiBearerAuth()
@@ -65,7 +62,6 @@ export class PostsController {
   }
 
   @Delete('/:post_id')
-
   @UseGuards(AuthGuard('jwt'))
   DeletePost(@Param() post_id: string): Promise<any> {
     return this.postservice.deletepost(post_id)
@@ -97,47 +93,9 @@ export class PostsController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('postimage', {
-    storage: diskStorage({
-      destination: './uploads/post',
-      filename: (req, file, cb) => {
-        const fileName = uuidv4();
-        return cb(null, `${fileName}${extname(file.originalname)}`);
-      }
-    })
-  }))
+  @UseInterceptors(FileInterceptor('postimage'))
   uploadImage(@Param() post_id: string, @UploadedFile() file: Express.Multer.File, @Req() req: RequestWithUser) {
-    return this.postservice.uploadpostphoto(post_id, file.filename, req.user.uid);
-  }
-
-  // UPDATE POST IMAGE
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('/picture/:post_id')
-  @ApiOperation({ summary: 'Update post image' })
-  @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        postimage: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @UseInterceptors(FileInterceptor('postimage', {
-    storage: diskStorage({
-      destination: './uploads/post',
-      filename: (req, file, cb) => {
-        const fileName = uuidv4();
-        return cb(null, `${fileName}${extname(file.originalname)}`);
-      }
-    })
-  }))
-  updateImage(@Param() post_id: string, @UploadedFile() file: Express.Multer.File, @Req() req: any) {
-    return this.postservice.updatepostimage(post_id, file.filename);
+    return this.postservice.uploadpostphoto( req.user.uid,post_id, file.buffer, file.originalname);
   }
 
   //DELETE POST IMAGE
@@ -158,8 +116,45 @@ export class PostsController {
     },
   })
   deletepostimage(@Param() post_id: string) {
-    console.log("sd")
     return this.postservice.deletepostimage(post_id);
-
   }
+
+  //GET IMAGES
+  @Get('/images/:id')
+  @ApiOperation({ summary: 'Get image by id' })
+  @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+  FindImage(@Param() param:any, @Res() res:any) {
+    const readStream = this.postservice.getImage(param.id)
+    readStream.pipe(res)
+  }
+
+    // // UPDATE POST IMAGE
+    // @UseGuards(AuthGuard('jwt'))
+    // @Patch('/picture/:post_id')
+    // @ApiOperation({ summary: 'Update post image' })
+    // @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({
+    //   schema: {
+    //     type: 'object',
+    //     properties: {
+    //       postimage: {
+    //         type: 'string',
+    //         format: 'binary',
+    //       },
+    //     },
+    //   },
+    // })
+    // @UseInterceptors(FileInterceptor('postimage', {
+    //   storage: diskStorage({
+    //     destination: './uploads/post',
+    //     filename: (req, file, cb) => {
+    //       const fileName = uuidv4();
+    //       return cb(null, `${fileName}${extname(file.originalname)}`);
+    //     }
+    //   })
+    // }))
+    // updateImage(@Param() post_id: string, @UploadedFile() file: Express.Multer.File, @Req() req: any) {
+    //   return this.postservice.updatepostimage(post_id, file.filename);
+    // }
 }

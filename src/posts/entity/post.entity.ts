@@ -29,8 +29,14 @@ export class Posts {
     @Column({ type: 'simple-array' })
     likes: string[];
 
-    @Column({nullable:true  })
-    post_image_name: string;
+    // @Column({nullable:true  })
+    // post_image_name: string;
+
+    @Column({ nullable: true })
+    post_image_url: string;
+  
+    @Column({ nullable : true})
+    public post_image_key: string;
 
     @Column({nullable:true})
     post_username:string

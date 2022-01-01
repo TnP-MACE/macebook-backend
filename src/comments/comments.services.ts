@@ -94,7 +94,7 @@ export class CommentsService {
       const profile_id = post.post_profile_id
       const profile = await this.profileRepository.findOne(profile_id)
       const post_body = post.text
-      const post_image_name = post.post_image_name
+      // const post_image_name = post.post_image_name
       const profile_name = profile.fullname
       const profile_image_name = profile.profile_image_url
       var comments = await this.commentRepository.find({ where: { post } })
