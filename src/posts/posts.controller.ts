@@ -63,6 +63,8 @@ export class PostsController {
 
   @Delete('/:post_id')
   @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Delete post ' })
+  @ApiParam({ name: 'post_id', required: true, schema: { oneOf: [{ type: 'string' }] } })
   DeletePost(@Param() post_id: string): Promise<any> {
     return this.postservice.deletepost(post_id)
   }
