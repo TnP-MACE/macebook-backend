@@ -37,17 +37,7 @@ export class PostsController {
     return this.postservice.getsinglepost(post_id)
   }
 
-  @Get('/search')
-  @UseGuards(AuthGuard('jwt'))
-  searchpost(@Query() topicdto: GetPostByTopic): Promise<any> {
-    return this.postservice.searchpost(topicdto)
-  }
-
-  @Get('/topic')
-  @UseGuards(AuthGuard('jwt'))
-  getpostbytopic(@Query() topicdto: GetPostByTopic): Promise<any> {
-    return this.postservice.getpostbytopic(topicdto)
-  }
+ 
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/add_post')
