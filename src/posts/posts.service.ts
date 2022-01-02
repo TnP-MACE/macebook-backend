@@ -48,27 +48,7 @@ export class PostsService {
     return post;
   }
 
-  async searchpost(topicdto: GetPostByTopic): Promise<any> {
-    const query = this.postrepository.createQueryBuilder('post');
-    const { search } = topicdto;
-    if (search) {
-      query.andWhere(
-        'post.text LIKE :search OR post.topic LIKE :search', { search: `%${search}%` }
-      );
-    }
-    const posts = await query.getMany();
-    return posts;
-  }
-
-  async getpostbytopic(topicdto: GetPostByTopic): Promise<any> {
-    const query = this.postrepository.createQueryBuilder('post');
-    const { topic } = topicdto;
-    if (topic) {
-      query.andWhere('post.topic = :topic', { topic });
-    }
-    const posts = await query.getMany();
-    return posts;
-  }
+  
 
   async insertpost(data: PostsDto, user_id: string): Promise<any> {
     console.log(data)
