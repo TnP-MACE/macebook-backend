@@ -255,7 +255,6 @@ export class PostsService {
   //       message: 'post image is not inserted',
   //     };
   //   }
-
   // }
 
 }
