@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors, } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileDto} from './dto/create-profile.dto';
 import { ProfileService } from './profile.service'
@@ -170,11 +170,10 @@ export class ProfileController {
   @Get('/images/:id')
   @ApiOperation({ summary: 'Get image by id' })
   @ApiParam({ name: 'id', required: true, schema: { oneOf: [{ type: 'string' }] } })
-  FindImage(@Param() param:any, @Res() res:any) {
-    const readStream = this.profileService.getImage(param.id)
-    readStream.pipe(res)
+  async FindImage(@Param() param:any, @Res() res:any) {
+    const readStream = await this.profileService.getImage(param.id)
+    readStream.createReadStream().pipe(res)
   }
-
   // CONNECTION CREATION //status= "invite","connected"
 
   @Post('/:id/invite')

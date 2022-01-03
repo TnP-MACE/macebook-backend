@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { getManager, Repository } from "typeorm";
 import Profile from './entities/profile.entity';
@@ -369,11 +369,16 @@ export class ProfileService {
     }
   }
 
-  getImage(fileKey : string){
+  async getImage(fileKey : string): Promise<any> {
+    try{
     const s3 = new S3();
-    return s3.getObject({Key: fileKey, Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME') }).createReadStream()
+    const data = await s3.getObject({Key: fileKey, Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME') }).promise()
+    return data
+    }
+    catch(e){
+      throw new NotFoundException
+    }
   }
-
 
   // CONNECTIONS
 
